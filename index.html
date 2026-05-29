@@ -79,10 +79,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 @keyframes ssAnim{0%{opacity:1}100%{opacity:0}}
 #ssFlash p{font-size:1.1rem;font-weight:700;color:#fff;background:rgba(200,20,20,.85);padding:10px 24px;border-radius:30px;letter-spacing:1px}
 
-/* dynamic watermark on board */
 #boardWrap{position:relative}
-#watermark{position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
-#watermark span{font-size:.55rem;color:rgba(255,255,255,.07);letter-spacing:3px;font-weight:700;transform:rotate(-30deg);white-space:nowrap;font-family:monospace;text-transform:uppercase;user-select:none}
 
 /* timed warning flash */
 @keyframes timedFlash{0%,100%{opacity:1}50%{opacity:.4}}
@@ -203,7 +200,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 <div id="main">
   <div id="boardWrap">
     <div id="board"></div>
-    <div id="watermark"><span id="wmText"></span></div>
+
     <div id="pauseOverlay">
       <h2>⏸ PAUSED</h2>
       <button id="bResume">▶ Resume</button>
@@ -794,20 +791,7 @@ window.addEventListener('resize',()=>{buildBoard();render();});
 // ══════════════════════════════════════════
 const SESSION_ID = Math.random().toString(36).slice(2,10).toUpperCase();
 let guardActive = false;
-let wmInterval = null;
 
-// Watermark: subtle rotating session ID visible in screenshots
-function startWatermark(){
-  const el = document.getElementById('wmText');
-  const wm = document.getElementById('watermark');
-  if(!el||!wm) return;
-  wm.style.opacity = '1';
-  clearInterval(wmInterval);
-  wmInterval = setInterval(()=>{
-    const ts = new Date().toISOString().slice(11,19);
-    el.textContent = `${SESSION_ID} · IQ BALL PUZZLE · ${ts} · ${SESSION_ID}`;
-  }, 1000);
-}
 
 // Show guard overlay — hides board, pauses timer
 function showGuard(){
@@ -891,8 +875,6 @@ function applyGuardLang(){
 const _origApplyLang = applyLang;
 // eslint-disable-next-line no-global-assign
 applyLang = function(){ _origApplyLang(); applyGuardLang(); };
-
-startWatermark();
 
 loadProfile();applyLang();initLevel(0);
 </script>
