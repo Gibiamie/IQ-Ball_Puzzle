@@ -64,6 +64,26 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 #pauseOverlay h2{font-size:2.5rem;color:#fff;letter-spacing:4px}
 #pauseOverlay button{padding:10px 28px;border:none;border-radius:28px;background:#00b894;color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
 
+/* focus-loss protection overlay */
+#guardOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(20px)}
+#guardOverlay.show{display:flex}
+#guardOverlay .guard-icon{font-size:3.5rem}
+#guardOverlay h2{font-size:1.6rem;color:#fff;letter-spacing:2px;text-align:center}
+#guardOverlay p{font-size:.85rem;color:#8b949e;text-align:center;max-width:280px;line-height:1.6}
+#guardOverlay button{padding:10px 28px;border:none;border-radius:28px;background:#e84393;color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
+#guardOverlay .guard-code{font-size:.65rem;color:#30363d;letter-spacing:2px;margin-top:8px;font-family:monospace}
+
+/* screenshot-flash */
+#ssFlash{display:none;position:fixed;inset:0;background:rgba(255,60,60,.18);z-index:950;align-items:center;justify-content:center;pointer-events:none}
+#ssFlash.show{display:flex;animation:ssAnim .6s ease-out forwards}
+@keyframes ssAnim{0%{opacity:1}100%{opacity:0}}
+#ssFlash p{font-size:1.1rem;font-weight:700;color:#fff;background:rgba(200,20,20,.85);padding:10px 24px;border-radius:30px;letter-spacing:1px}
+
+/* dynamic watermark on board */
+#boardWrap{position:relative}
+#watermark{position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+#watermark span{font-size:.55rem;color:rgba(255,255,255,.07);letter-spacing:3px;font-weight:700;transform:rotate(-30deg);white-space:nowrap;font-family:monospace;text-transform:uppercase;user-select:none}
+
 /* timed warning flash */
 @keyframes timedFlash{0%,100%{opacity:1}50%{opacity:.4}}
 .timer-warn{animation:timedFlash .8s ease-in-out infinite}
@@ -183,6 +203,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 <div id="main">
   <div id="boardWrap">
     <div id="board"></div>
+    <div id="watermark"><span id="wmText"></span></div>
     <div id="pauseOverlay">
       <h2>⏸ PAUSED</h2>
       <button id="bResume">▶ Resume</button>
@@ -255,6 +276,18 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
     <button class="modal-close" id="profileClose" data-i="close">Close</button>
   </div>
 </div>
+
+<!-- GUARD OVERLAY (focus loss / screenshot) -->
+<div id="guardOverlay">
+  <div class="guard-icon">🔒</div>
+  <h2 id="guardTitle">Game Paused</h2>
+  <p id="guardMsg">You left the game window. The board is hidden to protect puzzle integrity.</p>
+  <button id="bGuardResume">▶ Return to Game</button>
+  <div class="guard-code" id="guardCode"></div>
+</div>
+
+<!-- SCREENSHOT FLASH -->
+<div id="ssFlash"><p id="ssMsg">⚠️ Screenshot detected — solve the puzzle yourself!</p></div>
 
 <script>
 // ══════════════════════════════════════════
@@ -756,6 +789,111 @@ window.addEventListener('resize',()=>{buildBoard();render();});
 // ══════════════════════════════════════════
 // START
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// ANTI-CHEAT / SCREENSHOT PROTECTION
+// ══════════════════════════════════════════
+const SESSION_ID = Math.random().toString(36).slice(2,10).toUpperCase();
+let guardActive = false;
+let wmInterval = null;
+
+// Watermark: subtle rotating session ID visible in screenshots
+function startWatermark(){
+  const el = document.getElementById('wmText');
+  const wm = document.getElementById('watermark');
+  if(!el||!wm) return;
+  wm.style.opacity = '1';
+  clearInterval(wmInterval);
+  wmInterval = setInterval(()=>{
+    const ts = new Date().toISOString().slice(11,19);
+    el.textContent = `${SESSION_ID} · IQ BALL PUZZLE · ${ts} · ${SESSION_ID}`;
+  }, 1000);
+}
+
+// Show guard overlay — hides board, pauses timer
+function showGuard(){
+  if(guardActive) return;
+  guardActive = true;
+  if(!paused) pauseGame();
+  document.getElementById('guardCode').textContent = `SESSION: ${SESSION_ID}`;
+  document.getElementById('guardOverlay').classList.add('show');
+}
+
+// Dismiss guard — only on explicit click
+function hideGuard(){
+  guardActive = false;
+  document.getElementById('guardOverlay').classList.remove('show');
+  resumeGame();
+}
+
+// Flash on screenshot keys
+function flashScreenshot(){
+  const el = document.getElementById('ssFlash');
+  el.classList.remove('show');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 800);
+}
+
+// 1. Window loses focus → guard
+window.addEventListener('blur', showGuard);
+
+// 2. Tab hidden → guard
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden) showGuard();
+});
+
+// 3. PrintScreen / screenshot keys → flash warning
+document.addEventListener('keyup', e=>{
+  if(e.key==='PrintScreen'||e.key==='Print Screen'){
+    flashScreenshot();
+    // Attempt to overwrite clipboard with blank (works in some browsers)
+    try{ navigator.clipboard.writeText(''); }catch(_){}
+  }
+});
+
+// 4. Block devtools shortcuts
+document.addEventListener('keydown', e=>{
+  // F12, Ctrl+Shift+I/J/C, Ctrl+U
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&['I','i','J','j','C','c'].includes(e.key))||(e.ctrlKey&&(e.key==='u'||e.key==='U'))){
+    e.preventDefault();e.stopPropagation();return false;
+  }
+  // Windows Snipping Tool shortcut: Win+Shift+S (cannot fully block but detect)
+  if(e.key==='S'&&e.shiftKey&&(e.metaKey||e.ctrlKey)) flashScreenshot();
+  // macOS screenshot: Cmd+Shift+3 / Cmd+Shift+4
+  if(e.metaKey&&e.shiftKey&&(e.key==='3'||e.key==='4'||e.key==='5')) flashScreenshot();
+});
+
+// 5. Disable right-click everywhere (not just board)
+document.addEventListener('contextmenu', e=>{
+  // Allow only on board for piece removal (handled separately)
+  if(!e.target.closest('#board')) e.preventDefault();
+});
+
+// 6. Guard resume button
+document.getElementById('bGuardResume').addEventListener('click', hideGuard);
+
+// 7. Apply guard i18n
+function applyGuardLang(){
+  if(curLang==='id'){
+    document.getElementById('guardTitle').textContent='Permainan Dijeda';
+    document.getElementById('guardMsg').textContent='Anda meninggalkan jendela permainan. Papan disembunyikan untuk melindungi integritas teka-teki.';
+    document.getElementById('bGuardResume').textContent='▶ Kembali ke Permainan';
+    document.getElementById('ssMsg').textContent='⚠️ Screenshot terdeteksi — selesaikan teka-teki sendiri!';
+  } else {
+    document.getElementById('guardTitle').textContent='Game Paused';
+    document.getElementById('guardMsg').textContent='You left the game window. The board is hidden to protect puzzle integrity.';
+    document.getElementById('bGuardResume').textContent='▶ Return to Game';
+    document.getElementById('ssMsg').textContent='⚠️ Screenshot detected — solve the puzzle yourself!';
+  }
+}
+
+// Hook into existing lang toggle
+const _origApplyLang = applyLang;
+// eslint-disable-next-line no-global-assign
+applyLang = function(){ _origApplyLang(); applyGuardLang(); };
+
+startWatermark();
+
 loadProfile();applyLang();initLevel(0);
 </script>
 </body>
