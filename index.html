@@ -27,6 +27,23 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 #bReset{border-color:#e84393;color:#e84393}
 #bUndo{border-color:#74b9ff;color:#74b9ff}
 #bNext{border-color:#00b894;color:#00b894}
+#bBack{border-color:#636e72;color:#636e72}
+#bLvlSel{border-color:#fdcb6e;color:#fdcb6e}
+
+/* LEVEL SELECT MODAL */
+#lvlModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:400;align-items:center;justify-content:center}
+#lvlModal.show{display:flex}
+#lvlBox{background:#161b22;border:1px solid var(--border);border-radius:16px;padding:24px;min-width:340px;max-width:92vw}
+#lvlBox h3{font-size:1rem;color:#f9ca24;margin-bottom:16px;text-align:center;letter-spacing:2px}
+.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.lvl-btn{padding:12px 6px;border:1.5px solid var(--border);border-radius:10px;background:#0d1117;color:#e6edf3;font-size:.75rem;font-weight:700;cursor:pointer;text-align:center;transition:border-color .13s,background .13s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.lvl-btn:hover{border-color:#f9ca24;background:#21262d}
+.lvl-btn.current{border-color:#f9ca24;color:#f9ca24}
+.lvl-btn .lvl-num{font-size:1.1rem}
+.lvl-btn .lvl-size{font-size:.6rem;color:#8b949e}
+.lvl-btn .lvl-diff{font-size:.58rem;color:#636e72}
+#lvlClose{margin-top:14px;width:100%;padding:8px;border:1px solid var(--border);border-radius:20px;background:transparent;color:#8b949e;cursor:pointer;font-size:.8rem}
+#lvlClose:hover{background:#21262d}
 
 /* MAIN */
 #main{flex:1;display:flex;overflow:hidden}
@@ -102,6 +119,8 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
     </div>
   </div>
   <div class="hbtns">
+    <button id="bBack">◀ <span data-i="back">Back</span></button>
+    <button id="bLvlSel">☰ <span data-i="levels">Levels</span></button>
     <button id="bHint">💡 <span data-i="hint">Hint</span></button>
     <button id="bSolve">🤖 <span data-i="solve">Solve</span></button>
     <button id="bReset">↺ <span data-i="reset">Reset</span></button>
@@ -125,6 +144,14 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
   <button id="bWinNext">Next Level →</button>
 </div>
 
+<div id="lvlModal">
+  <div id="lvlBox">
+    <h3 id="lvlModalTitle">SELECT LEVEL</h3>
+    <div class="lvl-grid" id="lvlGrid"></div>
+    <button id="lvlClose">Close</button>
+  </div>
+</div>
+
 <div id="lbModal">
   <div id="lbBox">
     <h3 id="lbTitle">Leaderboard</h3>
@@ -141,7 +168,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 const LANG = {
   en:{
     level:'Level',left:'Left',time:'Time',lb:'Scores',hint:'Hint',solve:'Solve',
-    reset:'Reset',undo:'Undo',next:'Next',pieces:'PIECES',selectInst:'Select → click board',
+    reset:'Reset',undo:'Undo',next:'Next',back:'Back',levels:'Levels',pieces:'PIECES',selectInst:'Select → click board',
     footTip:'R=Rotate · F=Flip · ESC=Cancel · Right-click=Remove',
     congratulations:'🎉 Congratulations!',winMsg:(l,t)=>`Level ${l} done in ${t}!`,
     nextLevel:'Next Level →',lbTitle:'Leaderboard',noScores:'No records yet.',close:'Close',
@@ -150,7 +177,7 @@ const LANG = {
   },
   id:{
     level:'Level',left:'Sisa',time:'Waktu',lb:'Skor',hint:'Petunjuk',solve:'Selesaikan',
-    reset:'Ulang',undo:'Batalkan',next:'Berikutnya',pieces:'KEPINGAN',selectInst:'Pilih → klik papan',
+    reset:'Ulang',undo:'Batalkan',next:'Berikutnya',back:'Geri',levels:'Levellar',pieces:'KEPINGAN',selectInst:'Pilih → klik papan',
     footTip:'R=Putar · F=Balik · ESC=Batal · Klik-kanan=Hapus',
     congratulations:'🎉 Selamat!',winMsg:(l,t)=>`Level ${l} selesai dalam ${t}!`,
     nextLevel:'Level Berikutnya →',lbTitle:'Papan Skor',noScores:'Belum ada catatan.',close:'Tutup',
@@ -522,7 +549,11 @@ function initLevel(i){
   board=Array.from({length:rows},()=>Array(cols).fill(null));
   ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));
   sel=null; hov=null; elapsed=0; history=[];
-  document.getElementById('sLvl').textContent=lvIdx+1;
+  document.getElementById('sLvl').textContent=`${lvIdx+1}/${LEVELS.length}`;
+  document.getElementById('bBack').style.opacity = lvIdx===0?'0.3':'1';
+  document.getElementById('bBack').style.pointerEvents = lvIdx===0?'none':'auto';
+  document.getElementById('bNext').style.opacity = lvIdx===LEVELS.length-1?'0.3':'1';
+  document.getElementById('bNext').style.pointerEvents = lvIdx===LEVELS.length-1?'none':'auto';
   document.getElementById('win').classList.remove('show');
   buildBoard(); buildTray(); updRem(); startTimer(); render();
 }
@@ -532,7 +563,35 @@ function initLevel(i){
 // ═══════════════════════════════════════════
 document.getElementById('bReset').addEventListener('click',()=>initLevel(lvIdx));
 document.getElementById('bNext').addEventListener('click',()=>initLevel(lvIdx+1));
+document.getElementById('bBack').addEventListener('click',()=>initLevel(lvIdx-1));
 document.getElementById('bWinNext').addEventListener('click',()=>initLevel(lvIdx+1));
+
+// Level select modal
+const LEVEL_META = [
+  {size:'4×4', diff:'Beginner', diffID:'Başlangıç'},
+  {size:'5×5', diff:'Easy',     diffID:'Kolay'},
+  {size:'5×7', diff:'Medium',   diffID:'Orta'},
+  {size:'4×5', diff:'Hard',     diffID:'Zor'},
+];
+function showLvlModal(){
+  const grid=document.getElementById('lvlGrid');
+  grid.innerHTML='';
+  LEVEL_META.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lvl-btn'+(i===lvIdx?' current':'');
+    btn.innerHTML=`<span class="lvl-num">${i+1}</span><span class="lvl-size">${m.size}</span><span class="lvl-diff">${curLang==='id'?m.diffID:m.diff}</span>`;
+    btn.addEventListener('click',()=>{
+      document.getElementById('lvlModal').classList.remove('show');
+      initLevel(i);
+    });
+    grid.appendChild(btn);
+  });
+  document.getElementById('lvlModalTitle').textContent=curLang==='id'?'LEVEL SEÇ':'SELECT LEVEL';
+  document.getElementById('lvlClose').textContent=T().close;
+  document.getElementById('lvlModal').classList.add('show');
+}
+document.getElementById('bLvlSel').addEventListener('click',showLvlModal);
+document.getElementById('lvlClose').addEventListener('click',()=>document.getElementById('lvlModal').classList.remove('show'));
 document.getElementById('bUndo').addEventListener('click',undo);
 document.getElementById('bHint').addEventListener('click',doHint);
 document.getElementById('bSolve').addEventListener('click',doSolve);
