@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IQ Ball Puzzle</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--cs:50px}
+body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
+
+/* HEADER */
+#hdr{background:var(--panel);border-bottom:1px solid var(--border);padding:6px 14px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+#hdr-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#hdr-title{font-size:1.15rem;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#f9ca24,#f0932b,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.stats{display:flex;gap:14px;font-size:.8rem}
+.stat{display:flex;gap:4px;align-items:center}
+.stat span{color:#8b949e}
+.stat strong{color:#f9ca24;font-size:.9rem}
+.hbtns{display:flex;gap:5px;flex-wrap:wrap}
+.hbtns button{padding:3px 11px;border:1px solid var(--border);border-radius:18px;background:transparent;color:#e6edf3;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .13s}
+.hbtns button:hover{background:#21262d}
+#bLang{border-color:#8b949e;color:#8b949e}
+#bLB  {border-color:#f9ca24;color:#f9ca24}
+#bHint{border-color:#fdcb6e;color:#fdcb6e}
+#bSolve{border-color:#a29bfe;color:#a29bfe}
+#bReset{border-color:#e84393;color:#e84393}
+#bUndo{border-color:#74b9ff;color:#74b9ff}
+#bNext{border-color:#00b894;color:#00b894}
+
+/* MAIN */
+#main{flex:1;display:flex;overflow:hidden}
+
+/* BOARD */
+#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:hidden}
+#board{display:grid;gap:5px;background:#080c14;border:2px solid #21262d;border-radius:14px;padding:11px;box-shadow:0 6px 30px rgba(0,0,0,.7)}
+.cell{width:var(--cs);height:var(--cs);border-radius:50%;background:#1c2128;border:2px solid #21262d;cursor:pointer;position:relative;transition:transform .1s;display:flex;align-items:center;justify-content:center}
+.cell:hover{transform:scale(1.09)}
+.cell.filled{cursor:default}.cell.filled:hover{transform:none}
+.cell.ok{box-shadow:0 0 0 3px rgba(255,255,255,.55);transform:scale(1.07)}
+.cell.bad{box-shadow:0 0 0 3px rgba(255,60,60,.7)}
+.shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.48) 0%,transparent 58%);pointer-events:none}
+
+/* PANEL */
+#panel{width:190px;min-width:190px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#panelHead{padding:6px 11px;font-size:.62rem;font-weight:700;letter-spacing:2px;color:#8b949e;border-bottom:1px solid var(--border);flex-shrink:0}
+#plist{flex:1;overflow-y:auto;overflow-x:hidden;padding:5px;display:flex;flex-direction:column;gap:4px}
+#plist::-webkit-scrollbar{width:3px}
+#plist::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.pcard{background:#0d1117;border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;transition:border-color .13s,background .13s;display:flex;align-items:center;gap:6px}
+.pcard:hover{border-color:#8b949e;background:#161b22}
+.pcard.sel{border-color:#fff;background:#21262d}
+.pcard.placed{opacity:.22;pointer-events:none}
+.pgrid{display:grid;gap:2px;flex-shrink:0}
+.pdot{width:20px;height:20px;border-radius:50%}
+.pinfo{display:flex;flex-direction:column;gap:3px;flex:1;align-items:flex-end}
+.pname{font-size:.58rem;color:#8b949e}
+.pbtns{display:flex;gap:2px}
+.pbtns button{width:22px;height:22px;border:1px solid var(--border);border-radius:5px;background:#21262d;color:#e6edf3;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.pbtns button:hover{background:#30363d}
+#foot{padding:4px 10px;font-size:.6rem;color:#484f58;border-top:1px solid var(--border);flex-shrink:0;line-height:1.6}
+
+/* WIN */
+#win{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:13px}
+#win.show{display:flex}
+#win h2{font-size:2.2rem;background:linear-gradient(135deg,#f9ca24,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pop .7s ease-in-out infinite alternate}
+@keyframes pop{from{transform:scale(1)}to{transform:scale(1.08)}}
+#win p{color:#aaa;font-size:.9rem}
+#win button{padding:10px 28px;border:none;border-radius:28px;background:linear-gradient(135deg,#00b894,#00cec9);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
+
+/* LEADERBOARD MODAL */
+#lbModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;align-items:center;justify-content:center}
+#lbModal.show{display:flex}
+#lbBox{background:#161b22;border:1px solid var(--border);border-radius:14px;padding:20px;min-width:320px;max-width:90vw;max-height:80vh;overflow-y:auto}
+#lbBox h3{font-size:1rem;margin-bottom:12px;color:#f9ca24}
+.lb-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.lb-tab{padding:3px 10px;border:1px solid var(--border);border-radius:14px;background:transparent;color:#8b949e;font-size:.72rem;cursor:pointer;transition:background .13s}
+.lb-tab.active{border-color:#f9ca24;color:#f9ca24;background:#f9ca2411}
+.lb-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.lb-table th{color:#8b949e;text-align:left;padding:3px 6px;border-bottom:1px solid var(--border)}
+.lb-table td{padding:4px 6px;border-bottom:1px solid #21262d}
+.lb-table tr:first-child td{color:#f9ca24}
+.lb-table tr:nth-child(2) td{color:#ddd}
+#lbClose{margin-top:12px;padding:7px 20px;border:1px solid var(--border);border-radius:20px;background:transparent;color:#e6edf3;cursor:pointer;font-size:.8rem}
+#lbClose:hover{background:#21262d}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-top">
+    <span id="hdr-title">IQ BALL PUZZLE</span>
+    <div class="stats">
+      <div class="stat"><span data-i="level">Level</span><strong id="sLvl">1</strong></div>
+      <div class="stat"><span data-i="left">Left</span><strong id="sRem">0</strong></div>
+      <div class="stat"><span data-i="time">Time</span><strong id="sTim">0:00</strong></div>
+      <div class="stat"><span>🔥</span><strong id="sStreak">0</strong></div>
+    </div>
+    <div class="hbtns">
+      <button id="bLang">ID</button>
+      <button id="bLB">🏆 <span data-i="lb">Scores</span></button>
+    </div>
+  </div>
+  <div class="hbtns">
+    <button id="bHint">💡 <span data-i="hint">Hint</span></button>
+    <button id="bSolve">🤖 <span data-i="solve">Solve</span></button>
+    <button id="bReset">↺ <span data-i="reset">Reset</span></button>
+    <button id="bUndo">↩ <span data-i="undo">Undo</span></button>
+    <button id="bNext">▶ <span data-i="next">Next</span></button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="boardWrap"><div id="board"></div></div>
+  <div id="panel">
+    <div id="panelHead"><span data-i="pieces">PIECES</span> · <span data-i="selectInst">Select → click board</span></div>
+    <div id="plist"></div>
+    <div id="foot" data-i="footTip">R=Rotate · F=Flip · ESC=Cancel · Right-click=Remove</div>
+  </div>
+</div>
+
+<div id="win">
+  <h2 id="winTitle">Congratulations!</h2>
+  <p id="winMsg"></p>
+  <button id="bWinNext">Next Level →</button>
+</div>
+
+<div id="lbModal">
+  <div id="lbBox">
+    <h3 id="lbTitle">Leaderboard</h3>
+    <div class="lb-tabs" id="lbTabs"></div>
+    <table class="lb-table"><thead><tr><th>#</th><th data-i="lbName">Name</th><th data-i="time">Time</th><th>Date</th></tr></thead><tbody id="lbBody"></tbody></table>
+    <button id="lbClose" data-i="close">Close</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// I18N
+// ═══════════════════════════════════════════
+const LANG = {
+  en:{
+    level:'Level',left:'Left',time:'Time',lb:'Scores',hint:'Hint',solve:'Solve',
+    reset:'Reset',undo:'Undo',next:'Next',pieces:'PIECES',selectInst:'Select → click board',
+    footTip:'R=Rotate · F=Flip · ESC=Cancel · Right-click=Remove',
+    congratulations:'🎉 Congratulations!',winMsg:(l,t)=>`Level ${l} done in ${t}!`,
+    nextLevel:'Next Level →',lbTitle:'Leaderboard',noScores:'No records yet.',close:'Close',
+    lbName:'Name',enterName:'Your name for the leaderboard (leave blank to skip):',
+    colors:{R:'Red',O:'Orange',Y:'Yellow',G:'Green',T:'Teal',B:'Blue',V:'Purple',P:'Pink',X:'Cyan',N:'Brown'}
+  },
+  id:{
+    level:'Level',left:'Sisa',time:'Waktu',lb:'Skor',hint:'Petunjuk',solve:'Selesaikan',
+    reset:'Ulang',undo:'Batalkan',next:'Berikutnya',pieces:'KEPINGAN',selectInst:'Pilih → klik papan',
+    footTip:'R=Putar · F=Balik · ESC=Batal · Klik-kanan=Hapus',
+    congratulations:'🎉 Selamat!',winMsg:(l,t)=>`Level ${l} selesai dalam ${t}!`,
+    nextLevel:'Level Berikutnya →',lbTitle:'Papan Skor',noScores:'Belum ada catatan.',close:'Tutup',
+    lbName:'Nama',enterName:'Nama Anda untuk papan skor (kosongkan untuk lewati):',
+    colors:{R:'Merah',O:'Oranye',Y:'Kuning',G:'Hijau',T:'Hijau Toska',B:'Biru',V:'Ungu',P:'Pink',X:'Cyan',N:'Coklat'}
+  }
+};
+let curLang = localStorage.getItem('iqball_lang') || 'en';
+const T = () => LANG[curLang];
+
+// ═══════════════════════════════════════════
+// COLORS
+// ═══════════════════════════════════════════
+const COL = {
+  R:'#e74c3c',O:'#e67e22',Y:'#f1c40f',G:'#27ae60',
+  T:'#1abc9c',B:'#2980b9',V:'#8e44ad',P:'#e91e93',X:'#00bcd4',N:'#d35400'
+};
+const LETTER_COLOR = {A:'R',B:'O',C:'B',D:'G',E:'V',F:'T',G:'P',H:'Y',I:'X',J:'N'};
+
+// ═══════════════════════════════════════════
+// LEVELS — grid strings, verified cell counts
+// ═══════════════════════════════════════════
+// Each letter = one connected piece. Adjacency guaranteed by design.
+// Level N: rows×cols = sum of all piece cell counts ✓
+const RAW = [
+  // L1: 4×4=16  pieces: A3+B3+C4+D3+E3=16
+  {rows:4,cols:4,grid:["AABB","ACCB","DCCE","DDEE"]},
+  // L2: 5×5=25  pieces: A3+B4+C4+D4+E4+F3+G3=25
+  {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"]},
+  // L3: 5×7=35  pieces: A4+B4+C5+D3+E4+F4+G4+H4+I3=35
+  {rows:5,cols:7,grid:["AABBBCC","AADBECC","FDDEEGC","FFHEGGI","FHHHGII"]},
+  // L4: 4×5=20  pieces: A4+B3+C3+D4+E3+F3=20
+  {rows:4,cols:5,grid:["ABBCC","AABDC","EADDF","EEDFF"]},
+];
+
+// ═══════════════════════════════════════════
+// PARSE GRID → level object with pieces + solution
+// ═══════════════════════════════════════════
+function parseLevel(raw) {
+  const {rows, cols, grid} = raw;
+  const map = {};
+  grid.forEach((line, r) => [...line].forEach((ch, c) => {
+    if (!map[ch]) map[ch] = [];
+    map[ch].push([r, c]);
+  }));
+  const pieces = Object.keys(map).sort().map(ch => {
+    const abs = map[ch];
+    const mr = Math.min(...abs.map(([r]) => r));
+    const mc = Math.min(...abs.map(([,c]) => c));
+    return {
+      color: LETTER_COLOR[ch] || 'K',
+      cells: abs.map(([r,c]) => [r-mr, c-mc]),  // normalized shape = solution orientation
+      solveR: mr,
+      solveC: mc,
+    };
+  });
+  return {rows, cols, pieces};
+}
+const LEVELS = RAW.map(parseLevel);
+
+// ═══════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════
+let lvIdx=0, lv, rows, cols;
+let board;   // null | pieceIndex
+let ps;      // [{rot,flip,placed}]
+let sel=null, hov=null;
+let history=[];  // undo stack [{board,ps}]
+let tmID, t0, elapsed=0;
+
+// ═══════════════════════════════════════════
+// GEOMETRY
+// ═══════════════════════════════════════════
+const r90  = cs => cs.map(([r,c]) => [ c,-r]);
+const fH   = cs => cs.map(([r,c]) => [r,-c]);
+const norm = cs => {
+  const mr=Math.min(...cs.map(([r])=>r)), mc=Math.min(...cs.map(([,c])=>c));
+  return cs.map(([r,c])=>[r-mr,c-mc]);
+};
+function tfm(i) {
+  let cs = lv.pieces[i].cells.map(x=>[...x]);
+  for (let k=0;k<ps[i].rot;k++) cs=r90(cs);
+  if (ps[i].flip) cs=fH(cs);
+  return norm(cs);
+}
+function cellsAt(i,br,bc){ return tfm(i).map(([r,c])=>[br+r,bc+c]); }
+
+// ═══════════════════════════════════════════
+// BUILD BOARD DOM
+// ═══════════════════════════════════════════
+function buildBoard() {
+  const el = document.getElementById('board');
+  const aw = window.innerWidth - 194 - 24;
+  const ah = window.innerHeight - document.getElementById('hdr').offsetHeight - 24;
+  const sz = Math.min(56, Math.floor(Math.min(aw/cols, ah/rows)) - 5);
+  document.documentElement.style.setProperty('--cs', sz+'px');
+  el.style.gridTemplateColumns = `repeat(${cols},var(--cs))`;
+  el.innerHTML = '';
+  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) {
+    const d = document.createElement('div');
+    d.className='cell'; d.dataset.r=r; d.dataset.c=c;
+    d.addEventListener('mouseenter', () => { hov=[r,c]; render(); });
+    d.addEventListener('mouseleave', () => { hov=null; render(); });
+    d.addEventListener('click', () => onCell(r,c));
+    el.appendChild(d);
+  }
+  el.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    const t = e.target.closest('.cell'); if (!t) return;
+    const pi = board[+t.dataset.r][+t.dataset.c];
+    if (pi !== null) { pushHistory(); remPiece(pi); updRem(); buildTray(); render(); }
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER BOARD
+// ═══════════════════════════════════════════
+function gc(r,c){ return document.querySelector(`#board .cell[data-r="${r}"][data-c="${c}"]`); }
+function render() {
+  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) {
+    const el=gc(r,c); if (!el) continue;
+    el.className='cell'; el.innerHTML=''; el.style.cssText='';
+    const pi=board[r][c];
+    if (pi !== null) {
+      el.style.background = COL[lv.pieces[pi].color];
+      el.classList.add('filled');
+      el.innerHTML = '<div class="shine"></div>';
+    }
+  }
+  if (sel!==null && hov) {
+    const [hr,hc]=hov, ok=canPlace(sel,hr,hc);
+    for (const [r,c] of cellsAt(sel,hr,hc)) {
+      const el=gc(r,c); if (!el) continue;
+      if (ok) {
+        el.classList.add('ok');
+        el.style.background=COL[lv.pieces[sel].color];
+        el.style.opacity='.6';
+        el.innerHTML='<div class="shine"></div>';
+      } else { el.classList.add('bad'); }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// PIECE TRAY
+// ═══════════════════════════════════════════
+function buildTray() {
+  const wrap = document.getElementById('plist');
+  wrap.innerHTML = '';
+  lv.pieces.forEach((p, i) => {
+    const cs=tfm(i);
+    const mr=Math.max(...cs.map(([r])=>r));
+    const mc=Math.max(...cs.map(([,c])=>c));
+    const occ=new Set(cs.map(([r,c])=>`${r},${c}`));
+    const card=document.createElement('div');
+    card.className='pcard'+(ps[i].placed?' placed':sel===i?' sel':'');
+    // grid preview
+    const pg=document.createElement('div');
+    pg.className='pgrid';
+    pg.style.gridTemplateRows=`repeat(${mr+1},20px)`;
+    pg.style.gridTemplateColumns=`repeat(${mc+1},20px)`;
+    for (let r=0;r<=mr;r++) for (let c=0;c<=mc;c++) {
+      const b=document.createElement('div'); b.className='pdot';
+      b.style.background=occ.has(`${r},${c}`)
+        ?`radial-gradient(circle at 33% 28%,rgba(255,255,255,.4) 0%,${COL[p.color]} 60%)`
+        :'transparent';
+      pg.appendChild(b);
+    }
+    card.appendChild(pg);
+    card.addEventListener('click', () => selPiece(i));
+    // info
+    const info=document.createElement('div'); info.className='pinfo';
+    const nm=document.createElement('div'); nm.className='pname';
+    nm.textContent=T().colors[p.color]||p.color;
+    const btns=document.createElement('div'); btns.className='pbtns';
+    const br=document.createElement('button'); br.textContent='🔄';
+    br.addEventListener('click',e=>{e.stopPropagation();ps[i].rot=(ps[i].rot+1)%4;buildTray();render();});
+    const bf=document.createElement('button'); bf.textContent='🪞';
+    bf.addEventListener('click',e=>{e.stopPropagation();ps[i].flip=!ps[i].flip;buildTray();render();});
+    btns.append(br,bf); info.append(nm,btns); card.appendChild(info);
+    wrap.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════
+// INTERACTION
+// ═══════════════════════════════════════════
+function selPiece(i){ if(ps[i].placed)return; sel=(sel===i)?null:i; buildTray();render(); }
+function canPlace(i,br,bc){
+  for(const [r,c] of cellsAt(i,br,bc))
+    if(r<0||r>=rows||c<0||c>=cols||board[r][c]!==null) return false;
+  return true;
+}
+function onCell(r,c){
+  if(sel===null) return;
+  if(!canPlace(sel,r,c)){
+    const el=gc(r,c);
+    if(el){el.classList.add('bad');setTimeout(()=>render(),350);}
+    return;
+  }
+  pushHistory();
+  for(const [pr,pc] of cellsAt(sel,r,c)) board[pr][pc]=sel;
+  ps[sel].placed=true; sel=null; hov=null;
+  updRem(); buildTray(); render(); checkWin();
+}
+function remPiece(i){
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(board[r][c]===i) board[r][c]=null;
+  ps[i].placed=false;
+}
+
+// ═══════════════════════════════════════════
+// UNDO
+// ═══════════════════════════════════════════
+function pushHistory(){
+  history.push({
+    board: board.map(row=>[...row]),
+    ps: ps.map(p=>({...p}))
+  });
+  if(history.length>30) history.shift();
+}
+function undo(){
+  if(!history.length) return;
+  const snap=history.pop();
+  board=snap.board;
+  ps=snap.ps;
+  sel=null; hov=null;
+  updRem(); buildTray(); render();
+}
+
+// ═══════════════════════════════════════════
+// WIN
+// ═══════════════════════════════════════════
+function checkWin(){
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(board[r][c]===null) return;
+  clearInterval(tmID);
+  const s=Math.floor((Date.now()-t0)/1000);
+  updateStreak(); saveScore(s);
+  document.getElementById('winTitle').textContent=T().congratulations;
+  document.getElementById('winMsg').textContent=T().winMsg(lvIdx+1,fmt(s));
+  document.getElementById('bWinNext').textContent=T().nextLevel;
+  document.getElementById('win').classList.add('show');
+}
+
+// ═══════════════════════════════════════════
+// HINT / SOLVE  — uses embedded solution, no backtracking
+// ═══════════════════════════════════════════
+function doHint(){
+  for(let i=0;i<lv.pieces.length;i++){
+    if(ps[i].placed) continue;
+    // reset to solution orientation
+    ps[i].rot=0; ps[i].flip=false;
+    sel=i; buildTray(); render();
+    const el=gc(lv.pieces[i].solveR, lv.pieces[i].solveC);
+    if(el){ el.classList.add('ok'); setTimeout(()=>render(),1600); }
+    return;
+  }
+}
+function doSolve(){
+  pushHistory();
+  board=Array.from({length:rows},()=>Array(cols).fill(null));
+  ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));
+  sel=null;
+  lv.pieces.forEach((p,i)=>{
+    setTimeout(()=>{
+      for(const [r,c] of cellsAt(i,p.solveR,p.solveC)) board[r][c]=i;
+      ps[i].placed=true;
+      updRem(); buildTray(); render();
+      if(i===lv.pieces.length-1) checkWin();
+    }, i*280);
+  });
+}
+
+// ═══════════════════════════════════════════
+// STREAK
+// ═══════════════════════════════════════════
+function getStreak(){ return JSON.parse(localStorage.getItem('iqball_streak')||'{"lastDate":"","count":0,"best":0}'); }
+function updateStreak(){
+  const today=new Date().toISOString().slice(0,10);
+  const s=getStreak();
+  if(s.lastDate===today) return;
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  s.count = s.lastDate===yesterday ? s.count+1 : 1;
+  s.best  = Math.max(s.best, s.count);
+  s.lastDate=today;
+  localStorage.setItem('iqball_streak',JSON.stringify(s));
+  document.getElementById('sStreak').textContent=s.count;
+}
+function loadStreak(){
+  const s=getStreak();
+  document.getElementById('sStreak').textContent=s.count;
+}
+
+// ═══════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════
+function getScores(){ return JSON.parse(localStorage.getItem('iqball_scores')||'[]'); }
+function saveScore(secs){
+  let name=localStorage.getItem('iqball_name');
+  if(name===null){
+    name=prompt(T().enterName,'')?.trim()||'';
+    localStorage.setItem('iqball_name',name);
+  }
+  if(!name) return;
+  const scores=getScores();
+  scores.push({name,level:lvIdx+1,time:secs,date:new Date().toISOString().slice(0,10)});
+  localStorage.setItem('iqball_scores',JSON.stringify(scores));
+}
+let lbLevel=1;
+function showLB(){
+  lbLevel=1; renderLB();
+  document.getElementById('lbModal').classList.add('show');
+}
+function renderLB(){
+  const scores=getScores();
+  const tabs=document.getElementById('lbTabs');
+  tabs.innerHTML='';
+  LEVELS.forEach((_,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lb-tab'+(lbLevel===i+1?' active':'');
+    btn.textContent=`Level ${i+1}`;
+    btn.addEventListener('click',()=>{lbLevel=i+1;renderLB();});
+    tabs.appendChild(btn);
+  });
+  const rows=scores.filter(s=>s.level===lbLevel).sort((a,b)=>a.time-b.time).slice(0,5);
+  const body=document.getElementById('lbBody');
+  body.innerHTML='';
+  if(!rows.length){
+    body.innerHTML=`<tr><td colspan="4" style="color:#8b949e;padding:8px">${T().noScores}</td></tr>`;
+    return;
+  }
+  rows.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td>${fmt(s.time)}</td><td>${s.date}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════
+function startTimer(){
+  clearInterval(tmID);
+  t0=Date.now()-elapsed*1000;
+  tmID=setInterval(()=>{
+    elapsed=Math.floor((Date.now()-t0)/1000);
+    document.getElementById('sTim').textContent=fmt(elapsed);
+  },500);
+}
+function fmt(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+function updRem(){ document.getElementById('sRem').textContent=ps.filter(p=>!p.placed).length; }
+
+// ═══════════════════════════════════════════
+// I18N APPLY
+// ═══════════════════════════════════════════
+function applyLang(){
+  document.querySelectorAll('[data-i]').forEach(el=>{
+    const key=el.dataset.i;
+    if(T()[key]) el.textContent=T()[key];
+  });
+  document.getElementById('bLang').textContent=curLang==='en'?'ID':'EN';
+  if(typeof ps!=='undefined'&&ps) buildTray();
+}
+
+// ═══════════════════════════════════════════
+// INIT LEVEL
+// ═══════════════════════════════════════════
+function initLevel(i){
+  lvIdx=i%LEVELS.length; lv=LEVELS[lvIdx]; rows=lv.rows; cols=lv.cols;
+  board=Array.from({length:rows},()=>Array(cols).fill(null));
+  ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));
+  sel=null; hov=null; elapsed=0; history=[];
+  document.getElementById('sLvl').textContent=lvIdx+1;
+  document.getElementById('win').classList.remove('show');
+  buildBoard(); buildTray(); updRem(); startTimer(); render();
+}
+
+// ═══════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════
+document.getElementById('bReset').addEventListener('click',()=>initLevel(lvIdx));
+document.getElementById('bNext').addEventListener('click',()=>initLevel(lvIdx+1));
+document.getElementById('bWinNext').addEventListener('click',()=>initLevel(lvIdx+1));
+document.getElementById('bUndo').addEventListener('click',undo);
+document.getElementById('bHint').addEventListener('click',doHint);
+document.getElementById('bSolve').addEventListener('click',doSolve);
+document.getElementById('bLB').addEventListener('click',showLB);
+document.getElementById('lbClose').addEventListener('click',()=>document.getElementById('lbModal').classList.remove('show'));
+document.getElementById('bLang').addEventListener('click',()=>{
+  curLang=curLang==='en'?'id':'en';
+  localStorage.setItem('iqball_lang',curLang);
+  applyLang();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){sel=null;buildTray();render();return;}
+  if(e.ctrlKey&&e.key==='z'){undo();return;}
+  if(sel===null) return;
+  if(e.key==='r'||e.key==='R'){ps[sel].rot=(ps[sel].rot+1)%4;buildTray();render();}
+  if(e.key==='f'||e.key==='F'){ps[sel].flip=!ps[sel].flip;buildTray();render();}
+});
+
+window.addEventListener('resize',()=>{buildBoard();render();});
+
+// ═══════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════
+loadStreak();
+applyLang();
+initLevel(0);
+</script>
+</body>
+</html>
