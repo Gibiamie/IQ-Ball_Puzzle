@@ -496,18 +496,7 @@ function canPlace(i,br,bc){
   return true;
 }
 function onCell(r,c){
-  if(paused)return;
-  const pi=board[r][c];
-  // Click on a placed piece → pick it up (remove + select)
-  if(pi!==null&&pi!==-1&&pi!==-2){
-    pushHistory();
-    remPiece(pi);
-    sel=pi;
-    hov=null;
-    updRem();buildTray();render();
-    return;
-  }
-  if(sel===null)return;
+  if(sel===null||paused)return;
   if(!canPlace(sel,r,c)){const el=gc(r,c);if(el){el.classList.add('bad');setTimeout(()=>render(),350);}return;}
   pushHistory();
   for(const [pr,pc] of cellsAt(sel,r,c))board[pr][pc]=sel;
