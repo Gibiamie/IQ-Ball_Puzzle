@@ -2,7 +2,7 @@
 
 A browser-based puzzle game inspired by IQ Puzzler Pro. Place all colored ball pieces onto the board to fill every cell.
 
-**[▶ Play Now](https://Gibiamie.github.io/IQ-Ball-Puzzle/)**
+**[▶ Play Now](https://Gibiamie.github.io/IQ-Ball_Puzzle/)**
 
 ![IQ Ball Puzzle](https://img.shields.io/badge/HTML5-single%20file-orange?logo=html5)
 ![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
