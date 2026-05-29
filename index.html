@@ -9,97 +9,138 @@
 :root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--cs:50px}
 body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
 
-/* HEADER */
-#hdr{background:var(--panel);border-bottom:1px solid var(--border);padding:6px 14px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
-#hdr-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-#hdr-title{font-size:1.15rem;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#f9ca24,#f0932b,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-.stats{display:flex;gap:14px;font-size:.8rem}
-.stat{display:flex;gap:4px;align-items:center}
+/* ── HEADER ── */
+#hdr{background:var(--panel);border-bottom:1px solid var(--border);padding:5px 12px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+#hdr-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#hdr-title{font-size:1.1rem;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#f9ca24,#f0932b,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;cursor:pointer}
+.stats{display:flex;gap:12px;font-size:.78rem}
+.stat{display:flex;gap:3px;align-items:center}
 .stat span{color:#8b949e}
-.stat strong{color:#f9ca24;font-size:.9rem}
-.hbtns{display:flex;gap:5px;flex-wrap:wrap}
-.hbtns button{padding:3px 11px;border:1px solid var(--border);border-radius:18px;background:transparent;color:#e6edf3;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .13s}
-.hbtns button:hover{background:#21262d}
+.stat strong{color:#f9ca24;font-size:.88rem}
+#timVal{transition:color .3s}
+.hbtns{display:flex;gap:4px;flex-wrap:wrap}
+.hbtn{padding:3px 10px;border:1px solid var(--border);border-radius:16px;background:transparent;color:#e6edf3;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .12s;display:flex;align-items:center;gap:3px}
+.hbtn:hover{background:#21262d}
+.hbtn:disabled{opacity:.3;pointer-events:none}
 #bLang{border-color:#8b949e;color:#8b949e}
-#bLB  {border-color:#f9ca24;color:#f9ca24}
+#bLB{border-color:#f9ca24;color:#f9ca24}
+#bProfile{border-color:#74b9ff;color:#74b9ff;padding:2px 8px}
 #bHint{border-color:#fdcb6e;color:#fdcb6e}
 #bSolve{border-color:#a29bfe;color:#a29bfe}
 #bReset{border-color:#e84393;color:#e84393}
 #bUndo{border-color:#74b9ff;color:#74b9ff}
+#bPause{border-color:#00b894;color:#00b894}
 #bNext{border-color:#00b894;color:#00b894}
 #bBack{border-color:#636e72;color:#636e72}
 #bLvlSel{border-color:#fdcb6e;color:#fdcb6e}
+#bMode{border-color:#a29bfe;color:#a29bfe}
+#bMode.timed{border-color:#e74c3c;color:#e74c3c;background:#e74c3c11}
 
-/* LEVEL SELECT MODAL */
-#lvlModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:400;align-items:center;justify-content:center}
-#lvlModal.show{display:flex}
-#lvlBox{background:#161b22;border:1px solid var(--border);border-radius:16px;padding:24px;min-width:340px;max-width:92vw}
-#lvlBox h3{font-size:1rem;color:#f9ca24;margin-bottom:16px;text-align:center;letter-spacing:2px}
-.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.lvl-btn{padding:12px 6px;border:1.5px solid var(--border);border-radius:10px;background:#0d1117;color:#e6edf3;font-size:.75rem;font-weight:700;cursor:pointer;text-align:center;transition:border-color .13s,background .13s;display:flex;flex-direction:column;align-items:center;gap:3px}
-.lvl-btn:hover{border-color:#f9ca24;background:#21262d}
-.lvl-btn.current{border-color:#f9ca24;color:#f9ca24}
-.lvl-btn .lvl-num{font-size:1.1rem}
-.lvl-btn .lvl-size{font-size:.6rem;color:#8b949e}
-.lvl-btn .lvl-diff{font-size:.58rem;color:#636e72}
-#lvlClose{margin-top:14px;width:100%;padding:8px;border:1px solid var(--border);border-radius:20px;background:transparent;color:#8b949e;cursor:pointer;font-size:.8rem}
-#lvlClose:hover{background:#21262d}
+/* avatar chip */
+#avatarChip{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .13s}
+#avatarChip:hover{border-color:#fff5}
+#uname{font-size:.75rem;color:#e6edf3;cursor:pointer;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+#uname:hover{color:#fff}
 
-/* MAIN */
-#main{flex:1;display:flex;overflow:hidden}
+/* ── MAIN ── */
+#main{flex:1;display:flex;overflow:hidden;position:relative}
 
-/* BOARD */
-#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:hidden}
-#board{display:grid;gap:5px;background:#080c14;border:2px solid #21262d;border-radius:14px;padding:11px;box-shadow:0 6px 30px rgba(0,0,0,.7)}
+/* ── BOARD ── */
+#boardWrap{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;overflow:hidden;position:relative}
+#board{display:grid;gap:5px;background:#080c14;border:2px solid #21262d;border-radius:14px;padding:10px;box-shadow:0 6px 30px rgba(0,0,0,.7)}
 .cell{width:var(--cs);height:var(--cs);border-radius:50%;background:#1c2128;border:2px solid #21262d;cursor:pointer;position:relative;transition:transform .1s;display:flex;align-items:center;justify-content:center}
 .cell:hover{transform:scale(1.09)}
 .cell.filled{cursor:default}.cell.filled:hover{transform:none}
+.cell.blocked{background:transparent!important;border-color:transparent!important;cursor:default;pointer-events:none}
 .cell.ok{box-shadow:0 0 0 3px rgba(255,255,255,.55);transform:scale(1.07)}
 .cell.bad{box-shadow:0 0 0 3px rgba(255,60,60,.7)}
 .shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.48) 0%,transparent 58%);pointer-events:none}
 
-/* PANEL */
-#panel{width:190px;min-width:190px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-#panelHead{padding:6px 11px;font-size:.62rem;font-weight:700;letter-spacing:2px;color:#8b949e;border-bottom:1px solid var(--border);flex-shrink:0}
-#plist{flex:1;overflow-y:auto;overflow-x:hidden;padding:5px;display:flex;flex-direction:column;gap:4px}
+/* pause overlay */
+#pauseOverlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:50;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}
+#pauseOverlay.show{display:flex}
+#pauseOverlay h2{font-size:2.5rem;color:#fff;letter-spacing:4px}
+#pauseOverlay button{padding:10px 28px;border:none;border-radius:28px;background:#00b894;color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
+
+/* timed warning flash */
+@keyframes timedFlash{0%,100%{opacity:1}50%{opacity:.4}}
+.timer-warn{animation:timedFlash .8s ease-in-out infinite}
+
+/* ── PIECE PANEL ── */
+#panel{width:186px;min-width:186px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+#panelHead{padding:5px 10px;font-size:.6rem;font-weight:700;letter-spacing:2px;color:#8b949e;border-bottom:1px solid var(--border);flex-shrink:0}
+#plist{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;display:flex;flex-direction:column;gap:4px}
 #plist::-webkit-scrollbar{width:3px}
 #plist::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
-.pcard{background:#0d1117;border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;transition:border-color .13s,background .13s;display:flex;align-items:center;gap:6px}
+.pcard{background:#0d1117;border:1.5px solid var(--border);border-radius:8px;padding:6px 7px;cursor:pointer;transition:border-color .13s,background .13s;display:flex;align-items:center;gap:6px}
 .pcard:hover{border-color:#8b949e;background:#161b22}
 .pcard.sel{border-color:#fff;background:#21262d}
-.pcard.placed{opacity:.22;pointer-events:none}
+.pcard.placed{opacity:.2;pointer-events:none}
 .pgrid{display:grid;gap:2px;flex-shrink:0}
-.pdot{width:20px;height:20px;border-radius:50%}
+.pdot{width:19px;height:19px;border-radius:50%}
 .pinfo{display:flex;flex-direction:column;gap:3px;flex:1;align-items:flex-end}
-.pname{font-size:.58rem;color:#8b949e}
+.pname{font-size:.57rem;color:#8b949e}
 .pbtns{display:flex;gap:2px}
-.pbtns button{width:22px;height:22px;border:1px solid var(--border);border-radius:5px;background:#21262d;color:#e6edf3;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.pbtns button{width:21px;height:21px;border:1px solid var(--border);border-radius:5px;background:#21262d;color:#e6edf3;font-size:.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s}
 .pbtns button:hover{background:#30363d}
-#foot{padding:4px 10px;font-size:.6rem;color:#484f58;border-top:1px solid var(--border);flex-shrink:0;line-height:1.6}
+#foot{padding:4px 9px;font-size:.58rem;color:#484f58;border-top:1px solid var(--border);flex-shrink:0;line-height:1.55}
 
-/* WIN */
-#win{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:13px}
-#win.show{display:flex}
-#win h2{font-size:2.2rem;background:linear-gradient(135deg,#f9ca24,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pop .7s ease-in-out infinite alternate}
+/* ── MODALS BASE ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-box{background:#161b22;border:1px solid var(--border);border-radius:14px;padding:20px;max-width:92vw;max-height:85vh;overflow-y:auto;min-width:300px}
+.modal-box h3{font-size:.95rem;color:#f9ca24;margin-bottom:14px;letter-spacing:1px}
+.modal-close{margin-top:12px;width:100%;padding:7px;border:1px solid var(--border);border-radius:18px;background:transparent;color:#8b949e;cursor:pointer;font-size:.78rem}
+.modal-close:hover{background:#21262d}
+
+/* ── WIN MODAL ── */
+#winModal h2{font-size:2rem;background:linear-gradient(135deg,#f9ca24,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pop .7s ease-in-out infinite alternate;text-align:center}
 @keyframes pop{from{transform:scale(1)}to{transform:scale(1.08)}}
-#win p{color:#aaa;font-size:.9rem}
-#win button{padding:10px 28px;border:none;border-radius:28px;background:linear-gradient(135deg,#00b894,#00cec9);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer}
+#winModal p{color:#aaa;font-size:.88rem;text-align:center;margin:6px 0}
+.win-btns{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.win-btns button{padding:9px 22px;border:none;border-radius:24px;font-size:.85rem;font-weight:700;cursor:pointer}
+#bWinRetry{background:#21262d;color:#e6edf3;border:1px solid var(--border)}
+#bWinNext{background:linear-gradient(135deg,#00b894,#00cec9);color:#fff}
 
-/* LEADERBOARD MODAL */
-#lbModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;align-items:center;justify-content:center}
-#lbModal.show{display:flex}
-#lbBox{background:#161b22;border:1px solid var(--border);border-radius:14px;padding:20px;min-width:320px;max-width:90vw;max-height:80vh;overflow-y:auto}
-#lbBox h3{font-size:1rem;margin-bottom:12px;color:#f9ca24}
-.lb-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.lb-tab{padding:3px 10px;border:1px solid var(--border);border-radius:14px;background:transparent;color:#8b949e;font-size:.72rem;cursor:pointer;transition:background .13s}
+/* ── TIMEOUT MODAL ── */
+#timeoutModal h2{font-size:1.8rem;color:#e74c3c;text-align:center;margin-bottom:8px}
+#timeoutModal p{color:#aaa;text-align:center;font-size:.85rem;margin:4px 0}
+
+/* ── LEADERBOARD ── */
+.lb-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.lb-tab{padding:3px 9px;border:1px solid var(--border);border-radius:12px;background:transparent;color:#8b949e;font-size:.7rem;cursor:pointer}
 .lb-tab.active{border-color:#f9ca24;color:#f9ca24;background:#f9ca2411}
-.lb-table{width:100%;border-collapse:collapse;font-size:.78rem}
-.lb-table th{color:#8b949e;text-align:left;padding:3px 6px;border-bottom:1px solid var(--border)}
-.lb-table td{padding:4px 6px;border-bottom:1px solid #21262d}
+.lb-table{width:100%;border-collapse:collapse;font-size:.76rem}
+.lb-table th{color:#8b949e;text-align:left;padding:3px 5px;border-bottom:1px solid var(--border)}
+.lb-table td{padding:4px 5px;border-bottom:1px solid #21262d}
 .lb-table tr:first-child td{color:#f9ca24}
-.lb-table tr:nth-child(2) td{color:#ddd}
-#lbClose{margin-top:12px;padding:7px 20px;border:1px solid var(--border);border-radius:20px;background:transparent;color:#e6edf3;cursor:pointer;font-size:.8rem}
-#lbClose:hover{background:#21262d}
+
+/* ── LEVEL SELECT ── */
+.lvl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.lvl-btn{padding:10px 6px;border:1.5px solid var(--border);border-radius:9px;background:#0d1117;color:#e6edf3;font-size:.72rem;cursor:pointer;text-align:center;transition:border-color .13s,background .13s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.lvl-btn:hover{border-color:#f9ca24;background:#21262d}
+.lvl-btn.current{border-color:#f9ca24;color:#f9ca24}
+.lvl-btn .ln{font-size:1rem;font-weight:800}
+.lvl-btn .ls{font-size:.58rem;color:#8b949e}
+.lvl-btn .ld{font-size:.55rem;color:#636e72}
+.lvl-btn .lt{font-size:.55rem;color:#00b894}
+.shape-tag{display:inline-block;padding:1px 6px;border-radius:8px;font-size:.5rem;font-weight:700;letter-spacing:1px;margin-top:2px}
+.tag-rect{background:#2980b922;color:#3498db}
+.tag-L{background:#8e44ad22;color:#9b59b6}
+.tag-cross{background:#e74c3c22;color:#e74c3c}
+
+/* ── PROFILE ── */
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;margin:0 auto 12px;border:3px solid #30363d}
+.profile-name-row{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:16px}
+.profile-name-input{background:#0d1117;border:1px solid var(--border);border-radius:6px;color:#e6edf3;padding:4px 8px;font-size:.85rem;text-align:center;width:160px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat-card{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center}
+.stat-card .sv{font-size:1.3rem;font-weight:800;color:#f9ca24}
+.stat-card .sk{font-size:.6rem;color:#8b949e;margin-top:2px}
+.best-times{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:6px}
+.best-times th{color:#8b949e;padding:3px 6px;text-align:left;border-bottom:1px solid var(--border)}
+.best-times td{padding:4px 6px;border-bottom:1px solid #21262d}
+.best-times .medal{font-size:.85rem}
 </style>
 </head>
 <body>
@@ -107,30 +148,43 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 <div id="hdr">
   <div id="hdr-top">
     <span id="hdr-title">IQ BALL PUZZLE</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div id="avatarChip"></div>
+      <span id="uname">Player</span>
+    </div>
     <div class="stats">
-      <div class="stat"><span data-i="level">Level</span><strong id="sLvl">1</strong></div>
+      <div class="stat"><span data-i="level">Level</span><strong id="sLvl">1/6</strong></div>
       <div class="stat"><span data-i="left">Left</span><strong id="sRem">0</strong></div>
-      <div class="stat"><span data-i="time">Time</span><strong id="sTim">0:00</strong></div>
+      <div class="stat"><span id="timLabel">Time</span><strong id="timVal">0:00</strong></div>
       <div class="stat"><span>🔥</span><strong id="sStreak">0</strong></div>
     </div>
     <div class="hbtns">
-      <button id="bLang">ID</button>
-      <button id="bLB">🏆 <span data-i="lb">Scores</span></button>
+      <button class="hbtn" id="bProfile">👤</button>
+      <button class="hbtn" id="bLang">ID</button>
+      <button class="hbtn" id="bLB">🏆 <span data-i="lb">Scores</span></button>
     </div>
   </div>
   <div class="hbtns">
-    <button id="bBack">◀ <span data-i="back">Back</span></button>
-    <button id="bLvlSel">☰ <span data-i="levels">Levels</span></button>
-    <button id="bHint">💡 <span data-i="hint">Hint</span></button>
-    <button id="bSolve">🤖 <span data-i="solve">Solve</span></button>
-    <button id="bReset">↺ <span data-i="reset">Reset</span></button>
-    <button id="bUndo">↩ <span data-i="undo">Undo</span></button>
-    <button id="bNext">▶ <span data-i="next">Next</span></button>
+    <button class="hbtn" id="bBack">◀ <span data-i="back">Back</span></button>
+    <button class="hbtn" id="bLvlSel">☰ <span data-i="levels">Levels</span></button>
+    <button class="hbtn" id="bMode">⏱ <span data-i="modeNormal">Normal</span></button>
+    <button class="hbtn" id="bHint">💡 <span data-i="hint">Hint</span></button>
+    <button class="hbtn" id="bSolve">🤖 <span data-i="solve">Solve</span></button>
+    <button class="hbtn" id="bPause">⏸ <span data-i="pause">Pause</span></button>
+    <button class="hbtn" id="bReset">↺ <span data-i="reset">Reset</span></button>
+    <button class="hbtn" id="bUndo">↩ <span data-i="undo">Undo</span></button>
+    <button class="hbtn" id="bNext">▶ <span data-i="next">Next</span></button>
   </div>
 </div>
 
 <div id="main">
-  <div id="boardWrap"><div id="board"></div></div>
+  <div id="boardWrap">
+    <div id="board"></div>
+    <div id="pauseOverlay">
+      <h2>⏸ PAUSED</h2>
+      <button id="bResume">▶ Resume</button>
+    </div>
+  </div>
   <div id="panel">
     <div id="panelHead"><span data-i="pieces">PIECES</span> · <span data-i="selectInst">Select → click board</span></div>
     <div id="plist"></div>
@@ -138,487 +192,557 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
   </div>
 </div>
 
-<div id="win">
-  <h2 id="winTitle">Congratulations!</h2>
-  <p id="winMsg"></p>
-  <button id="bWinNext">Next Level →</button>
-</div>
-
-<div id="lvlModal">
-  <div id="lvlBox">
-    <h3 id="lvlModalTitle">SELECT LEVEL</h3>
-    <div class="lvl-grid" id="lvlGrid"></div>
-    <button id="lvlClose">Close</button>
+<!-- WIN -->
+<div class="modal" id="winModal">
+  <div class="modal-box" style="text-align:center">
+    <h2 id="winTitle">🎉 Congratulations!</h2>
+    <p id="winMsg"></p>
+    <p id="winRecord" style="color:#f9ca24;font-weight:700;font-size:.9rem"></p>
+    <div class="win-btns">
+      <button id="bWinRetry" data-i="tryAgain">Try Again</button>
+      <button id="bWinNext" data-i="nextLevel">Next Level →</button>
+    </div>
   </div>
 </div>
 
-<div id="lbModal">
-  <div id="lbBox">
+<!-- TIMEOUT -->
+<div class="modal" id="timeoutModal">
+  <div class="modal-box" style="text-align:center">
+    <h2>⏰</h2>
+    <h2 id="timeoutTitle" style="font-size:1.6rem;color:#e74c3c;margin-bottom:8px">Time's Up!</h2>
+    <p id="timeoutMsg" style="color:#aaa;margin-bottom:12px"></p>
+    <div class="win-btns">
+      <button id="bTimeRetry" style="background:#e74c3c;color:#fff;padding:9px 22px;border:none;border-radius:24px;font-size:.85rem;font-weight:700;cursor:pointer" data-i="tryAgain">Try Again</button>
+      <button id="bTimeSkip" style="background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:9px 22px;border-radius:24px;font-size:.85rem;cursor:pointer" data-i="skip">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="modal" id="lbModal">
+  <div class="modal-box">
     <h3 id="lbTitle">Leaderboard</h3>
     <div class="lb-tabs" id="lbTabs"></div>
-    <table class="lb-table"><thead><tr><th>#</th><th data-i="lbName">Name</th><th data-i="time">Time</th><th>Date</th></tr></thead><tbody id="lbBody"></tbody></table>
-    <button id="lbClose" data-i="close">Close</button>
+    <table class="lb-table"><thead><tr><th>#</th><th data-i="lbName">Name</th><th data-i="time">Time</th><th>Mode</th><th>Date</th></tr></thead><tbody id="lbBody"></tbody></table>
+    <button class="modal-close" id="lbClose" data-i="close">Close</button>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div class="modal" id="lvlModal">
+  <div class="modal-box">
+    <h3 id="lvlModalTitle">SELECT LEVEL</h3>
+    <div class="lvl-grid" id="lvlGrid"></div>
+    <button class="modal-close" id="lvlClose" data-i="close">Close</button>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="modal" id="profileModal">
+  <div class="modal-box" style="min-width:320px">
+    <h3 data-i="profileTitle">My Profile</h3>
+    <div id="profileAvatar" class="profile-avatar-big"></div>
+    <div class="profile-name-row">
+      <input id="profileNameInput" class="profile-name-input" type="text" maxlength="20">
+      <button style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#21262d;color:#e6edf3;font-size:.75rem;cursor:pointer" id="bSaveName" data-i="save">Save</button>
+    </div>
+    <div class="stats-grid" id="profileStats"></div>
+    <div style="font-size:.65rem;color:#8b949e;margin:6px 0 4px" data-i="bestTimes">Best Times</div>
+    <table class="best-times"><thead><tr><th data-i="level">Level</th><th data-i="time">Time</th><th>Mode</th></tr></thead><tbody id="bestTimesBody"></tbody></table>
+    <button class="modal-close" id="profileClose" data-i="close">Close</button>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // I18N
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 const LANG = {
   en:{
     level:'Level',left:'Left',time:'Time',lb:'Scores',hint:'Hint',solve:'Solve',
-    reset:'Reset',undo:'Undo',next:'Next',back:'Back',levels:'Levels',pieces:'PIECES',selectInst:'Select → click board',
+    reset:'Reset',undo:'Undo',next:'Next',back:'Back',levels:'Levels',pause:'Pause',
+    resume:'Resume',modeNormal:'Normal',modeTimed:'Timed',pieces:'PIECES',
+    selectInst:'Select → click board',
     footTip:'R=Rotate · F=Flip · ESC=Cancel · Right-click=Remove',
-    congratulations:'🎉 Congratulations!',winMsg:(l,t)=>`Level ${l} done in ${t}!`,
-    nextLevel:'Next Level →',lbTitle:'Leaderboard',noScores:'No records yet.',close:'Close',
-    lbName:'Name',enterName:'Your name for the leaderboard (leave blank to skip):',
+    congratulations:'🎉 Congratulations!',winMsg:(l,t,m)=>`Level ${l} · ${m} · ${t}`,
+    newRecord:'🏆 New Record!',tryAgain:'Try Again',nextLevel:'Next Level →',skip:'Skip',
+    lbTitle:'Leaderboard',noScores:'No records yet.',close:'Close',lbName:'Name',
+    enterName:'Your name for the leaderboard (blank to skip):',
+    profileTitle:'My Profile',save:'Save',bestTimes:'Best Times',
+    timeUp:"Time's Up!",timeUpMsg:(t)=>`The time limit was ${fmt(t)}.`,
+    modeTimed2:'Timed',modeNormal2:'Normal',
+    shapes:{rect:'Rectangle',lshape:'L-Shape',cross:'Cross'},
+    diffs:{Beginner:'Beginner',Easy:'Easy',Medium:'Medium',Hard:'Hard',Expert:'Expert',Master:'Master'},
     colors:{R:'Red',O:'Orange',Y:'Yellow',G:'Green',T:'Teal',B:'Blue',V:'Purple',P:'Pink',X:'Cyan',N:'Brown'}
   },
   id:{
     level:'Level',left:'Sisa',time:'Waktu',lb:'Skor',hint:'Petunjuk',solve:'Selesaikan',
-    reset:'Ulang',undo:'Batalkan',next:'Berikutnya',back:'Geri',levels:'Levellar',pieces:'KEPINGAN',selectInst:'Pilih → klik papan',
+    reset:'Ulang',undo:'Batalkan',next:'Berikutnya',back:'Geri',levels:'Levellar',pause:'Jeda',
+    resume:'Lanjut',modeNormal:'Normal',modeTimed:'Terwaktu',pieces:'KEPINGAN',
+    selectInst:'Pilih → klik papan',
     footTip:'R=Putar · F=Balik · ESC=Batal · Klik-kanan=Hapus',
-    congratulations:'🎉 Selamat!',winMsg:(l,t)=>`Level ${l} selesai dalam ${t}!`,
-    nextLevel:'Level Berikutnya →',lbTitle:'Papan Skor',noScores:'Belum ada catatan.',close:'Tutup',
-    lbName:'Nama',enterName:'Nama Anda untuk papan skor (kosongkan untuk lewati):',
-    colors:{R:'Merah',O:'Oranye',Y:'Kuning',G:'Hijau',T:'Hijau Toska',B:'Biru',V:'Ungu',P:'Pink',X:'Cyan',N:'Coklat'}
+    congratulations:'🎉 Selamat!',winMsg:(l,t,m)=>`Level ${l} · ${m} · ${t}`,
+    newRecord:'🏆 Rekor Baru!',tryAgain:'Coba Lagi',nextLevel:'Level Berikutnya →',skip:'Lewati',
+    lbTitle:'Papan Skor',noScores:'Belum ada catatan.',close:'Tutup',lbName:'Nama',
+    enterName:'Nama Anda untuk papan skor (kosong untuk lewati):',
+    profileTitle:'Profil Saya',save:'Simpan',bestTimes:'Waktu Terbaik',
+    timeUp:'Waktu Habis!',timeUpMsg:(t)=>`Batas waktu adalah ${fmt(t)}.`,
+    modeTimed2:'Terwaktu',modeNormal2:'Normal',
+    shapes:{rect:'Persegi',lshape:'Bentuk-L',cross:'Silang'},
+    diffs:{Beginner:'Pemula',Easy:'Mudah',Medium:'Sedang',Hard:'Sulit',Expert:'Ahli',Master:'Master'},
+    colors:{R:'Merah',O:'Oranye',Y:'Kuning',G:'Hijau',T:'Toska',B:'Biru',V:'Ungu',P:'Pink',X:'Cyan',N:'Coklat'}
   }
 };
-let curLang = localStorage.getItem('iqball_lang') || 'en';
-const T = () => LANG[curLang];
+let curLang = localStorage.getItem('iqball_lang')||'en';
+const T = ()=>LANG[curLang];
 
-// ═══════════════════════════════════════════
-// COLORS
-// ═══════════════════════════════════════════
-const COL = {
-  R:'#e74c3c',O:'#e67e22',Y:'#f1c40f',G:'#27ae60',
-  T:'#1abc9c',B:'#2980b9',V:'#8e44ad',P:'#e91e93',X:'#00bcd4',N:'#d35400'
-};
-const LETTER_COLOR = {A:'R',B:'O',C:'B',D:'G',E:'V',F:'T',G:'P',H:'Y',I:'X',J:'N'};
+// ══════════════════════════════════════════
+// COLORS + LETTERS
+// ══════════════════════════════════════════
+const COL={R:'#e74c3c',O:'#e67e22',Y:'#f1c40f',G:'#27ae60',T:'#1abc9c',B:'#2980b9',V:'#8e44ad',P:'#e91e93',X:'#00bcd4',N:'#d35400'};
+const LC={A:'R',B:'O',C:'B',D:'G',E:'V',F:'T',G:'P',H:'Y',I:'X',J:'N'};
+const AVATAR_COLORS=['#e74c3c','#e67e22','#f1c40f','#27ae60','#1abc9c','#2980b9','#8e44ad','#e91e93'];
 
-// ═══════════════════════════════════════════
-// LEVELS — grid strings, verified cell counts
-// ═══════════════════════════════════════════
-// Each letter = one connected piece. Adjacency guaranteed by design.
-// Level N: rows×cols = sum of all piece cell counts ✓
-const RAW = [
-  // L1: 4×4=16  pieces: A3+B3+C4+D3+E3=16
-  {rows:4,cols:4,grid:["AABB","ACCB","DCCE","DDEE"]},
-  // L2: 5×5=25  pieces: A3+B4+C4+D4+E4+F3+G3=25
-  {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"]},
-  // L3: 5×7=35  pieces: A4+B4+C5+D3+E4+F4+G4+H4+I3=35
-  {rows:5,cols:7,grid:["AABBBCC","AADBECC","FDDEEGC","FFHEGGI","FHHHGII"]},
-  // L4: 4×5=20  pieces: A4+B3+C3+D4+E3+F3=20
-  {rows:4,cols:5,grid:["ABBCC","AABDC","EADDF","EEDFF"]},
+// ══════════════════════════════════════════
+// LEVELS  — '.' = blocked cell
+// verified: sum(piece cells) = playable cells
+// ══════════════════════════════════════════
+const RAW=[
+  // L1: 4×4=16   A3+B3+C4+D3+E3=16   Rectangle
+  {rows:4,cols:4,grid:["AABB","ACCB","DCCE","DDEE"],shape:'rect',diff:'Beginner',time:90},
+  // L2: 5×5=25   A3+B4+C4+D4+E4+F3+G3=25   Rectangle
+  {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],shape:'rect',diff:'Easy',time:150},
+  // L3: 5×7=35   A4+B4+C5+D3+E4+F4+G4+H4+I3=35   Rectangle
+  {rows:5,cols:7,grid:["AABBBCC","AADBECC","FDDEEGC","FFHEGGI","FHHHGII"],shape:'rect',diff:'Medium',time:240},
+  // L4: 4×5=20   A4+B3+C3+D4+E3+F3=20   Rectangle
+  {rows:4,cols:5,grid:["ABBCC","AABDC","EADDF","EEDFF"],shape:'rect',diff:'Hard',time:120},
+  // L5: L-shape (6×4 minus top-right 2×2) = 20 cells
+  //   A4+B3+C3+D3+E3+F2+G2=20
+  {rows:6,cols:4,grid:["AA..","AB..","ABCC","DBEC","DDEF","GGEF"],shape:'lshape',diff:'Expert',time:150},
+  // L6: Cross (5×5 minus 4 corners) = 21 cells
+  //   A3+B3+C3+D3+E5+F4=21
+  {rows:5,cols:5,grid:[".ABB.","AABCC","DDEFC","DEEFF",".EEF."],shape:'cross',diff:'Master',time:180},
 ];
 
-// ═══════════════════════════════════════════
-// PARSE GRID → level object with pieces + solution
-// ═══════════════════════════════════════════
-function parseLevel(raw) {
-  const {rows, cols, grid} = raw;
-  const map = {};
-  grid.forEach((line, r) => [...line].forEach((ch, c) => {
-    if (!map[ch]) map[ch] = [];
-    map[ch].push([r, c]);
+// ══════════════════════════════════════════
+// PARSE LEVEL
+// ══════════════════════════════════════════
+function parseLevel(raw){
+  const {rows,cols,grid,shape,diff,time}=raw;
+  const map={};
+  const blocked=new Set();
+  grid.forEach((line,r)=>[...line].forEach((ch,c)=>{
+    if(ch==='.')blocked.add(`${r},${c}`);
+    else{if(!map[ch])map[ch]=[];map[ch].push([r,c]);}
   }));
-  const pieces = Object.keys(map).sort().map(ch => {
-    const abs = map[ch];
-    const mr = Math.min(...abs.map(([r]) => r));
-    const mc = Math.min(...abs.map(([,c]) => c));
-    return {
-      color: LETTER_COLOR[ch] || 'K',
-      cells: abs.map(([r,c]) => [r-mr, c-mc]),  // normalized shape = solution orientation
-      solveR: mr,
-      solveC: mc,
-    };
+  const pieces=Object.keys(map).sort().map(ch=>{
+    const abs=map[ch];
+    const mr=Math.min(...abs.map(([r])=>r)),mc=Math.min(...abs.map(([,c])=>c));
+    return{color:LC[ch]||'K',cells:abs.map(([r,c])=>[r-mr,c-mc]),solveR:mr,solveC:mc};
   });
-  return {rows, cols, pieces};
+  return{rows,cols,pieces,blocked,shape,diff,time};
 }
-const LEVELS = RAW.map(parseLevel);
+const LEVELS=RAW.map(parseLevel);
 
-// ═══════════════════════════════════════════
-// GAME STATE
-// ═══════════════════════════════════════════
-let lvIdx=0, lv, rows, cols;
-let board;   // null | pieceIndex
-let ps;      // [{rot,flip,placed}]
-let sel=null, hov=null;
-let history=[];  // undo stack [{board,ps}]
-let tmID, t0, elapsed=0;
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let lvIdx=0,lv,rows,cols;
+let board; // null=empty, -1=blocked, N=pieceIdx
+let ps;    // [{rot,flip,placed}]
+let sel=null,hov=null;
+let history=[];
+let tmID,t0,elapsed=0,remaining=0;
+let paused=false,timedMode=false;
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // GEOMETRY
-// ═══════════════════════════════════════════
-const r90  = cs => cs.map(([r,c]) => [ c,-r]);
-const fH   = cs => cs.map(([r,c]) => [r,-c]);
-const norm = cs => {
-  const mr=Math.min(...cs.map(([r])=>r)), mc=Math.min(...cs.map(([,c])=>c));
-  return cs.map(([r,c])=>[r-mr,c-mc]);
-};
-function tfm(i) {
-  let cs = lv.pieces[i].cells.map(x=>[...x]);
-  for (let k=0;k<ps[i].rot;k++) cs=r90(cs);
-  if (ps[i].flip) cs=fH(cs);
-  return norm(cs);
-}
-function cellsAt(i,br,bc){ return tfm(i).map(([r,c])=>[br+r,bc+c]); }
+// ══════════════════════════════════════════
+const r90=cs=>cs.map(([r,c])=>[c,-r]);
+const fH =cs=>cs.map(([r,c])=>[r,-c]);
+const norm=cs=>{const mr=Math.min(...cs.map(([r])=>r)),mc=Math.min(...cs.map(([,c])=>c));return cs.map(([r,c])=>[r-mr,c-mc]);};
+function tfm(i){let cs=lv.pieces[i].cells.map(x=>[...x]);for(let k=0;k<ps[i].rot;k++)cs=r90(cs);if(ps[i].flip)cs=fH(cs);return norm(cs);}
+function cellsAt(i,br,bc){return tfm(i).map(([r,c])=>[br+r,bc+c]);}
 
-// ═══════════════════════════════════════════
-// BUILD BOARD DOM
-// ═══════════════════════════════════════════
-function buildBoard() {
-  const el = document.getElementById('board');
-  const aw = window.innerWidth - 194 - 24;
-  const ah = window.innerHeight - document.getElementById('hdr').offsetHeight - 24;
-  const sz = Math.min(56, Math.floor(Math.min(aw/cols, ah/rows)) - 5);
-  document.documentElement.style.setProperty('--cs', sz+'px');
-  el.style.gridTemplateColumns = `repeat(${cols},var(--cs))`;
-  el.innerHTML = '';
-  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) {
-    const d = document.createElement('div');
-    d.className='cell'; d.dataset.r=r; d.dataset.c=c;
-    d.addEventListener('mouseenter', () => { hov=[r,c]; render(); });
-    d.addEventListener('mouseleave', () => { hov=null; render(); });
-    d.addEventListener('click', () => onCell(r,c));
+// ══════════════════════════════════════════
+// BUILD BOARD
+// ══════════════════════════════════════════
+function buildBoard(){
+  const el=document.getElementById('board');
+  const aw=window.innerWidth-190-22;
+  const ah=window.innerHeight-document.getElementById('hdr').offsetHeight-22;
+  const sz=Math.min(56,Math.floor(Math.min(aw/cols,ah/rows))-5);
+  document.documentElement.style.setProperty('--cs',sz+'px');
+  el.style.gridTemplateColumns=`repeat(${cols},var(--cs))`;
+  el.innerHTML='';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const d=document.createElement('div');
+    d.className='cell';d.dataset.r=r;d.dataset.c=c;
+    if(lv.blocked.has(`${r},${c}`)){d.classList.add('blocked');}
+    else{
+      d.addEventListener('mouseenter',()=>{hov=[r,c];render();});
+      d.addEventListener('mouseleave',()=>{hov=null;render();});
+      d.addEventListener('click',()=>onCell(r,c));
+    }
     el.appendChild(d);
   }
-  el.addEventListener('contextmenu', e => {
+  el.addEventListener('contextmenu',e=>{
     e.preventDefault();
-    const t = e.target.closest('.cell'); if (!t) return;
-    const pi = board[+t.dataset.r][+t.dataset.c];
-    if (pi !== null) { pushHistory(); remPiece(pi); updRem(); buildTray(); render(); }
+    const t=e.target.closest('.cell');if(!t||t.classList.contains('blocked'))return;
+    const pi=board[+t.dataset.r][+t.dataset.c];
+    if(pi!==null&&pi!==-1){pushHistory();remPiece(pi);updRem();buildTray();render();}
   });
 }
 
-// ═══════════════════════════════════════════
-// RENDER BOARD
-// ═══════════════════════════════════════════
-function gc(r,c){ return document.querySelector(`#board .cell[data-r="${r}"][data-c="${c}"]`); }
-function render() {
-  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) {
-    const el=gc(r,c); if (!el) continue;
-    el.className='cell'; el.innerHTML=''; el.style.cssText='';
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function gc(r,c){return document.querySelector(`#board .cell[data-r="${r}"][data-c="${c}"]`);}
+function render(){
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const el=gc(r,c);if(!el||el.classList.contains('blocked'))continue;
+    el.className='cell';el.innerHTML='';el.style.cssText='';
     const pi=board[r][c];
-    if (pi !== null) {
-      el.style.background = COL[lv.pieces[pi].color];
-      el.classList.add('filled');
-      el.innerHTML = '<div class="shine"></div>';
-    }
+    if(pi!==null&&pi!==-1){el.style.background=COL[lv.pieces[pi].color];el.classList.add('filled');el.innerHTML='<div class="shine"></div>';}
   }
-  if (sel!==null && hov) {
-    const [hr,hc]=hov, ok=canPlace(sel,hr,hc);
-    for (const [r,c] of cellsAt(sel,hr,hc)) {
-      const el=gc(r,c); if (!el) continue;
-      if (ok) {
-        el.classList.add('ok');
-        el.style.background=COL[lv.pieces[sel].color];
-        el.style.opacity='.6';
-        el.innerHTML='<div class="shine"></div>';
-      } else { el.classList.add('bad'); }
+  if(sel!==null&&hov){
+    const [hr,hc]=hov,ok=canPlace(sel,hr,hc);
+    for(const [r,c] of cellsAt(sel,hr,hc)){
+      const el=gc(r,c);if(!el||el.classList.contains('blocked'))continue;
+      if(ok){el.classList.add('ok');el.style.background=COL[lv.pieces[sel].color];el.style.opacity='.62';el.innerHTML='<div class="shine"></div>';}
+      else el.classList.add('bad');
     }
   }
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // PIECE TRAY
-// ═══════════════════════════════════════════
-function buildTray() {
-  const wrap = document.getElementById('plist');
-  wrap.innerHTML = '';
-  lv.pieces.forEach((p, i) => {
-    const cs=tfm(i);
-    const mr=Math.max(...cs.map(([r])=>r));
-    const mc=Math.max(...cs.map(([,c])=>c));
+// ══════════════════════════════════════════
+function buildTray(){
+  const wrap=document.getElementById('plist');wrap.innerHTML='';
+  lv.pieces.forEach((p,i)=>{
+    const cs=tfm(i),mr=Math.max(...cs.map(([r])=>r)),mc=Math.max(...cs.map(([,c])=>c));
     const occ=new Set(cs.map(([r,c])=>`${r},${c}`));
     const card=document.createElement('div');
     card.className='pcard'+(ps[i].placed?' placed':sel===i?' sel':'');
-    // grid preview
-    const pg=document.createElement('div');
-    pg.className='pgrid';
-    pg.style.gridTemplateRows=`repeat(${mr+1},20px)`;
-    pg.style.gridTemplateColumns=`repeat(${mc+1},20px)`;
-    for (let r=0;r<=mr;r++) for (let c=0;c<=mc;c++) {
-      const b=document.createElement('div'); b.className='pdot';
-      b.style.background=occ.has(`${r},${c}`)
-        ?`radial-gradient(circle at 33% 28%,rgba(255,255,255,.4) 0%,${COL[p.color]} 60%)`
-        :'transparent';
+    const pg=document.createElement('div');pg.className='pgrid';
+    pg.style.gridTemplateRows=`repeat(${mr+1},19px)`;pg.style.gridTemplateColumns=`repeat(${mc+1},19px)`;
+    for(let r=0;r<=mr;r++) for(let c=0;c<=mc;c++){
+      const b=document.createElement('div');b.className='pdot';
+      b.style.background=occ.has(`${r},${c}`)?`radial-gradient(circle at 33% 28%,rgba(255,255,255,.4) 0%,${COL[p.color]} 60%)`:'transparent';
       pg.appendChild(b);
     }
-    card.appendChild(pg);
-    card.addEventListener('click', () => selPiece(i));
-    // info
-    const info=document.createElement('div'); info.className='pinfo';
-    const nm=document.createElement('div'); nm.className='pname';
-    nm.textContent=T().colors[p.color]||p.color;
-    const btns=document.createElement('div'); btns.className='pbtns';
-    const br=document.createElement('button'); br.textContent='🔄';
+    card.appendChild(pg);card.addEventListener('click',()=>selPiece(i));
+    const info=document.createElement('div');info.className='pinfo';
+    const nm=document.createElement('div');nm.className='pname';nm.textContent=T().colors[p.color]||p.color;
+    const btns=document.createElement('div');btns.className='pbtns';
+    const br=document.createElement('button');br.textContent='🔄';
     br.addEventListener('click',e=>{e.stopPropagation();ps[i].rot=(ps[i].rot+1)%4;buildTray();render();});
-    const bf=document.createElement('button'); bf.textContent='🪞';
+    const bf=document.createElement('button');bf.textContent='🪞';
     bf.addEventListener('click',e=>{e.stopPropagation();ps[i].flip=!ps[i].flip;buildTray();render();});
-    btns.append(br,bf); info.append(nm,btns); card.appendChild(info);
-    wrap.appendChild(card);
+    btns.append(br,bf);info.append(nm,btns);card.appendChild(info);wrap.appendChild(card);
   });
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // INTERACTION
-// ═══════════════════════════════════════════
-function selPiece(i){ if(ps[i].placed)return; sel=(sel===i)?null:i; buildTray();render(); }
+// ══════════════════════════════════════════
+function selPiece(i){if(ps[i].placed)return;sel=(sel===i)?null:i;buildTray();render();}
 function canPlace(i,br,bc){
   for(const [r,c] of cellsAt(i,br,bc))
     if(r<0||r>=rows||c<0||c>=cols||board[r][c]!==null) return false;
   return true;
 }
 function onCell(r,c){
-  if(sel===null) return;
-  if(!canPlace(sel,r,c)){
-    const el=gc(r,c);
-    if(el){el.classList.add('bad');setTimeout(()=>render(),350);}
-    return;
-  }
+  if(sel===null||paused)return;
+  if(!canPlace(sel,r,c)){const el=gc(r,c);if(el){el.classList.add('bad');setTimeout(()=>render(),350);}return;}
   pushHistory();
-  for(const [pr,pc] of cellsAt(sel,r,c)) board[pr][pc]=sel;
-  ps[sel].placed=true; sel=null; hov=null;
-  updRem(); buildTray(); render(); checkWin();
+  for(const [pr,pc] of cellsAt(sel,r,c))board[pr][pc]=sel;
+  ps[sel].placed=true;sel=null;hov=null;updRem();buildTray();render();checkWin();
 }
-function remPiece(i){
-  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(board[r][c]===i) board[r][c]=null;
-  ps[i].placed=false;
-}
+function remPiece(i){for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(board[r][c]===i)board[r][c]=null;ps[i].placed=false;}
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // UNDO
-// ═══════════════════════════════════════════
-function pushHistory(){
-  history.push({
-    board: board.map(row=>[...row]),
-    ps: ps.map(p=>({...p}))
-  });
-  if(history.length>30) history.shift();
-}
-function undo(){
-  if(!history.length) return;
-  const snap=history.pop();
-  board=snap.board;
-  ps=snap.ps;
-  sel=null; hov=null;
-  updRem(); buildTray(); render();
-}
+// ══════════════════════════════════════════
+function pushHistory(){history.push({board:board.map(r=>[...r]),ps:ps.map(p=>({...p}))});if(history.length>30)history.shift();}
+function undo(){if(!history.length)return;const s=history.pop();board=s.board;ps=s.ps;sel=null;hov=null;updRem();buildTray();render();}
 
-// ═══════════════════════════════════════════
-// WIN
-// ═══════════════════════════════════════════
-function checkWin(){
-  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(board[r][c]===null) return;
+// ══════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════
+function startTimer(){
   clearInterval(tmID);
-  const s=Math.floor((Date.now()-t0)/1000);
-  updateStreak(); saveScore(s);
+  t0=Date.now()-(timedMode?0:elapsed*1000);
+  tmID=setInterval(()=>{
+    if(paused)return;
+    const tv=document.getElementById('timVal');
+    if(timedMode){
+      remaining=lv.time-Math.floor((Date.now()-t0)/1000);
+      if(remaining<=0){remaining=0;tv.textContent=fmt(0);onTimeout();return;}
+      tv.textContent=fmt(remaining);
+      tv.style.color=remaining<30?'#e74c3c':remaining<60?'#f39c12':'#f9ca24';
+      tv.className=remaining<30?'timer-warn':'';
+    }else{
+      elapsed=Math.floor((Date.now()-t0)/1000);
+      tv.textContent=fmt(elapsed);
+      tv.style.color='#f9ca24';tv.className='';
+    }
+  },500);
+}
+function pauseGame(){if(paused)return;paused=true;clearInterval(tmID);document.getElementById('pauseOverlay').classList.add('show');}
+function resumeGame(){if(!paused)return;paused=false;document.getElementById('pauseOverlay').classList.remove('show');startTimer();}
+function fmt(s){return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function updRem(){document.getElementById('sRem').textContent=ps.filter(p=>!p.placed).length;}
+
+// ══════════════════════════════════════════
+// WIN / TIMEOUT
+// ══════════════════════════════════════════
+function checkWin(){
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(board[r][c]===null)return;
+  clearInterval(tmID);
+  const finalTime=timedMode?lv.time-remaining:elapsed;
+  updateStreak();
+  const isRecord=saveScore(finalTime);
   document.getElementById('winTitle').textContent=T().congratulations;
-  document.getElementById('winMsg').textContent=T().winMsg(lvIdx+1,fmt(s));
+  document.getElementById('winMsg').textContent=T().winMsg(lvIdx+1,fmt(finalTime),timedMode?T().modeTimed2:T().modeNormal2);
+  document.getElementById('winRecord').textContent=isRecord?T().newRecord:'';
   document.getElementById('bWinNext').textContent=T().nextLevel;
-  document.getElementById('win').classList.add('show');
+  document.getElementById('bWinRetry').textContent=T().tryAgain;
+  document.getElementById('winModal').classList.add('show');
+}
+function onTimeout(){
+  clearInterval(tmID);
+  document.getElementById('timeoutTitle').textContent=T().timeUp;
+  document.getElementById('timeoutMsg').textContent=T().timeUpMsg(lv.time);
+  document.getElementById('bTimeRetry').textContent=T().tryAgain;
+  document.getElementById('bTimeSkip').textContent=T().skip;
+  document.getElementById('timeoutModal').classList.add('show');
 }
 
-// ═══════════════════════════════════════════
-// HINT / SOLVE  — uses embedded solution, no backtracking
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
+// HINT / SOLVE
+// ══════════════════════════════════════════
 function doHint(){
   for(let i=0;i<lv.pieces.length;i++){
-    if(ps[i].placed) continue;
-    // reset to solution orientation
-    ps[i].rot=0; ps[i].flip=false;
-    sel=i; buildTray(); render();
-    const el=gc(lv.pieces[i].solveR, lv.pieces[i].solveC);
-    if(el){ el.classList.add('ok'); setTimeout(()=>render(),1600); }
+    if(ps[i].placed)continue;
+    ps[i].rot=0;ps[i].flip=false;sel=i;buildTray();render();
+    const el=gc(lv.pieces[i].solveR,lv.pieces[i].solveC);
+    if(el){el.classList.add('ok');setTimeout(()=>render(),1600);}
     return;
   }
 }
 function doSolve(){
   pushHistory();
   board=Array.from({length:rows},()=>Array(cols).fill(null));
-  ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));
-  sel=null;
-  lv.pieces.forEach((p,i)=>{
-    setTimeout(()=>{
-      for(const [r,c] of cellsAt(i,p.solveR,p.solveC)) board[r][c]=i;
-      ps[i].placed=true;
-      updRem(); buildTray(); render();
-      if(i===lv.pieces.length-1) checkWin();
-    }, i*280);
-  });
+  lv.blocked.forEach(key=>{const[r,c]=key.split(',').map(Number);board[r][c]=-1;});
+  ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));sel=null;
+  lv.pieces.forEach((p,i)=>setTimeout(()=>{
+    for(const[r,c]of cellsAt(i,p.solveR,p.solveC))board[r][c]=i;
+    ps[i].placed=true;updRem();buildTray();render();
+    if(i===lv.pieces.length-1)checkWin();
+  },i*280));
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // STREAK
-// ═══════════════════════════════════════════
-function getStreak(){ return JSON.parse(localStorage.getItem('iqball_streak')||'{"lastDate":"","count":0,"best":0}'); }
+// ══════════════════════════════════════════
+function getStreak(){return JSON.parse(localStorage.getItem('iqball_streak')||'{"lastDate":"","count":0,"best":0}');}
 function updateStreak(){
   const today=new Date().toISOString().slice(0,10);
-  const s=getStreak();
-  if(s.lastDate===today) return;
-  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  s.count = s.lastDate===yesterday ? s.count+1 : 1;
-  s.best  = Math.max(s.best, s.count);
-  s.lastDate=today;
+  const s=getStreak();if(s.lastDate===today)return;
+  const yest=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  s.count=s.lastDate===yest?s.count+1:1;s.best=Math.max(s.best,s.count);s.lastDate=today;
   localStorage.setItem('iqball_streak',JSON.stringify(s));
   document.getElementById('sStreak').textContent=s.count;
 }
-function loadStreak(){
-  const s=getStreak();
-  document.getElementById('sStreak').textContent=s.count;
-}
+function loadStreak(){document.getElementById('sStreak').textContent=getStreak().count;}
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // LEADERBOARD
-// ═══════════════════════════════════════════
-function getScores(){ return JSON.parse(localStorage.getItem('iqball_scores')||'[]'); }
+// ══════════════════════════════════════════
+function getScores(){return JSON.parse(localStorage.getItem('iqball_scores')||'[]');}
 function saveScore(secs){
   let name=localStorage.getItem('iqball_name');
-  if(name===null){
-    name=prompt(T().enterName,'')?.trim()||'';
-    localStorage.setItem('iqball_name',name);
-  }
-  if(!name) return;
+  if(name===null){name=(prompt(T().enterName,'')||'').trim();localStorage.setItem('iqball_name',name||'');}
+  if(!name)return false;
   const scores=getScores();
-  scores.push({name,level:lvIdx+1,time:secs,date:new Date().toISOString().slice(0,10)});
+  const key=`${lvIdx}_${timedMode?1:0}`;
+  const prev=scores.filter(s=>s.key===key&&s.name===name).sort((a,b)=>a.time-b.time)[0];
+  const isRecord=!prev||secs<prev.time;
+  scores.push({name,level:lvIdx+1,time:secs,mode:timedMode?'timed':'normal',key,date:new Date().toISOString().slice(0,10)});
   localStorage.setItem('iqball_scores',JSON.stringify(scores));
+  return isRecord;
 }
 let lbLevel=1;
-function showLB(){
-  lbLevel=1; renderLB();
-  document.getElementById('lbModal').classList.add('show');
-}
+function showLB(){lbLevel=1;renderLB();document.getElementById('lbModal').classList.add('show');}
 function renderLB(){
   const scores=getScores();
-  const tabs=document.getElementById('lbTabs');
-  tabs.innerHTML='';
+  const tabs=document.getElementById('lbTabs');tabs.innerHTML='';
   LEVELS.forEach((_,i)=>{
-    const btn=document.createElement('button');
-    btn.className='lb-tab'+(lbLevel===i+1?' active':'');
-    btn.textContent=`Level ${i+1}`;
-    btn.addEventListener('click',()=>{lbLevel=i+1;renderLB();});
-    tabs.appendChild(btn);
+    const btn=document.createElement('button');btn.className='lb-tab'+(lbLevel===i+1?' active':'');
+    btn.textContent=`L${i+1}`;btn.addEventListener('click',()=>{lbLevel=i+1;renderLB();});tabs.appendChild(btn);
   });
-  const rows=scores.filter(s=>s.level===lbLevel).sort((a,b)=>a.time-b.time).slice(0,5);
-  const body=document.getElementById('lbBody');
-  body.innerHTML='';
-  if(!rows.length){
-    body.innerHTML=`<tr><td colspan="4" style="color:#8b949e;padding:8px">${T().noScores}</td></tr>`;
-    return;
-  }
-  rows.forEach((s,i)=>{
+  const rows2=scores.filter(s=>s.level===lbLevel).sort((a,b)=>a.time-b.time).slice(0,5);
+  const body=document.getElementById('lbBody');body.innerHTML='';
+  if(!rows2.length){body.innerHTML=`<tr><td colspan="5" style="color:#8b949e;padding:8px">${T().noScores}</td></tr>`;return;}
+  rows2.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${['🥇','🥈','🥉','4','5'][i]}</td><td>${s.name}</td><td>${fmt(s.time)}</td><td style="color:${s.mode==='timed'?'#e74c3c':'#8b949e'}">${s.mode==='timed'?T().modeTimed2:T().modeNormal2}</td><td>${s.date}</td>`;body.appendChild(tr);});
+}
+
+// ══════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════
+function getProfile(){return JSON.parse(localStorage.getItem('iqball_profile')||'{"name":"","color":"#e84393"}');}
+function saveProfile(p){localStorage.setItem('iqball_profile',JSON.stringify(p));}
+function getAvatarColor(name){if(!name)return'#636e72';let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%AVATAR_COLORS.length;return AVATAR_COLORS[h];}
+function renderAvatar(name,color,el,size=26){
+  el.style.background=color;el.style.width=size+'px';el.style.height=size+'px';
+  el.style.fontSize=(size*.4)+'px';el.textContent=(name||'?')[0].toUpperCase();
+}
+function loadProfile(){
+  const p=getProfile();
+  const name=p.name||localStorage.getItem('iqball_name')||'';
+  const color=p.color||getAvatarColor(name);
+  renderAvatar(name,color,document.getElementById('avatarChip'));
+  document.getElementById('uname').textContent=name||'Player';
+}
+function showProfile(){
+  const p=getProfile();
+  const name=p.name||localStorage.getItem('iqball_name')||'';
+  const color=p.color||getAvatarColor(name);
+  renderAvatar(name,color,document.getElementById('profileAvatar'),64);
+  document.getElementById('profileNameInput').value=name;
+  // stats
+  const scores=getScores();const streak=getStreak();
+  const sg=document.getElementById('profileStats');sg.innerHTML='';
+  const cards=[
+    {v:scores.length,k:'Games'},
+    {v:streak.count,k:'🔥 Streak'},
+    {v:streak.best,k:'Best Streak'},
+    {v:[...new Set(scores.map(s=>s.level))].length,k:'Levels Done'},
+  ];
+  cards.forEach(({v,k})=>{const d=document.createElement('div');d.className='stat-card';d.innerHTML=`<div class="sv">${v}</div><div class="sk">${k}</div>`;sg.appendChild(d);});
+  // best times
+  const bt=document.getElementById('bestTimesBody');bt.innerHTML='';
+  LEVELS.forEach((_,i)=>{
+    const lvScores=scores.filter(s=>s.level===i+1).sort((a,b)=>a.time-b.time);
+    const best=lvScores[0];
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i+1}</td><td>${s.name}</td><td>${fmt(s.time)}</td><td>${s.date}</td>`;
-    body.appendChild(tr);
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    tr.innerHTML=`<td>${medal} L${i+1}</td><td>${best?fmt(best.time):'-'}</td><td style="color:${best&&best.mode==='timed'?'#e74c3c':'#8b949e'}">${best?(best.mode==='timed'?T().modeTimed2:T().modeNormal2):'-'}</td>`;
+    bt.appendChild(tr);
   });
+  document.getElementById('profileModal').classList.add('show');
 }
 
-// ═══════════════════════════════════════════
-// TIMER
-// ═══════════════════════════════════════════
-function startTimer(){
-  clearInterval(tmID);
-  t0=Date.now()-elapsed*1000;
-  tmID=setInterval(()=>{
-    elapsed=Math.floor((Date.now()-t0)/1000);
-    document.getElementById('sTim').textContent=fmt(elapsed);
-  },500);
+// ══════════════════════════════════════════
+// LEVEL SELECT
+// ══════════════════════════════════════════
+const SHAPE_TAG={rect:'tag-rect',lshape:'tag-L',cross:'tag-cross'};
+function showLvlModal(){
+  const grid=document.getElementById('lvlGrid');grid.innerHTML='';
+  LEVELS.forEach((lv2,i)=>{
+    const btn=document.createElement('button');
+    btn.className='lvl-btn'+(i===lvIdx?' current':'');
+    const shapeLabel=T().shapes[lv2.shape]||lv2.shape;
+    const diffLabel=T().diffs[lv2.diff]||lv2.diff;
+    btn.innerHTML=`<span class="ln">${i+1}</span><span class="ls">${lv2.rows}×${lv2.cols}</span><span class="ld">${diffLabel}</span><span class="shape-tag ${SHAPE_TAG[lv2.shape]||''}">${shapeLabel}</span><span class="lt">⏱${fmt(lv2.time)}</span>`;
+    btn.addEventListener('click',()=>{document.getElementById('lvlModal').classList.remove('show');initLevel(i);});
+    grid.appendChild(btn);
+  });
+  document.getElementById('lvlModalTitle').textContent=curLang==='id'?'PILIH LEVEL':'SELECT LEVEL';
+  document.getElementById('lvlModal').classList.add('show');
 }
-function fmt(s){ return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
-function updRem(){ document.getElementById('sRem').textContent=ps.filter(p=>!p.placed).length; }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // I18N APPLY
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 function applyLang(){
-  document.querySelectorAll('[data-i]').forEach(el=>{
-    const key=el.dataset.i;
-    if(T()[key]) el.textContent=T()[key];
-  });
+  document.querySelectorAll('[data-i]').forEach(el=>{const k=el.dataset.i;if(T()[k])el.textContent=T()[k];});
   document.getElementById('bLang').textContent=curLang==='en'?'ID':'EN';
-  if(typeof ps!=='undefined'&&ps) buildTray();
+  document.getElementById('timLabel').textContent=timedMode?'⏱':T().time;
+  document.getElementById('bMode').querySelector('span').textContent=timedMode?T().modeTimed:T().modeNormal;
+  if(typeof ps!=='undefined'&&ps)buildTray();
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // INIT LEVEL
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 function initLevel(i){
-  lvIdx=i%LEVELS.length; lv=LEVELS[lvIdx]; rows=lv.rows; cols=lv.cols;
+  lvIdx=i%LEVELS.length;lv=LEVELS[lvIdx];rows=lv.rows;cols=lv.cols;
   board=Array.from({length:rows},()=>Array(cols).fill(null));
+  lv.blocked.forEach(key=>{const[r,c]=key.split(',').map(Number);board[r][c]=-1;});
   ps=lv.pieces.map(()=>({rot:0,flip:false,placed:false}));
-  sel=null; hov=null; elapsed=0; history=[];
+  sel=null;hov=null;elapsed=0;remaining=lv.time;history=[];paused=false;
+  document.getElementById('pauseOverlay').classList.remove('show');
+  ['winModal','timeoutModal'].forEach(id=>document.getElementById(id).classList.remove('show'));
   document.getElementById('sLvl').textContent=`${lvIdx+1}/${LEVELS.length}`;
-  document.getElementById('bBack').style.opacity = lvIdx===0?'0.3':'1';
-  document.getElementById('bBack').style.pointerEvents = lvIdx===0?'none':'auto';
-  document.getElementById('bNext').style.opacity = lvIdx===LEVELS.length-1?'0.3':'1';
-  document.getElementById('bNext').style.pointerEvents = lvIdx===LEVELS.length-1?'none':'auto';
-  document.getElementById('win').classList.remove('show');
-  buildBoard(); buildTray(); updRem(); startTimer(); render();
+  document.getElementById('bBack').disabled=lvIdx===0;
+  document.getElementById('bNext').disabled=lvIdx===LEVELS.length-1;
+  document.getElementById('bMode').className='hbtn'+(timedMode?' timed':'');
+  document.getElementById('timLabel').textContent=timedMode?'⏱':T().time;
+  buildBoard();buildTray();updRem();loadStreak();startTimer();render();
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // EVENTS
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 document.getElementById('bReset').addEventListener('click',()=>initLevel(lvIdx));
 document.getElementById('bNext').addEventListener('click',()=>initLevel(lvIdx+1));
 document.getElementById('bBack').addEventListener('click',()=>initLevel(lvIdx-1));
-document.getElementById('bWinNext').addEventListener('click',()=>initLevel(lvIdx+1));
-
-// Level select modal
-const LEVEL_META = [
-  {size:'4×4', diff:'Beginner', diffID:'Başlangıç'},
-  {size:'5×5', diff:'Easy',     diffID:'Kolay'},
-  {size:'5×7', diff:'Medium',   diffID:'Orta'},
-  {size:'4×5', diff:'Hard',     diffID:'Zor'},
-];
-function showLvlModal(){
-  const grid=document.getElementById('lvlGrid');
-  grid.innerHTML='';
-  LEVEL_META.forEach((m,i)=>{
-    const btn=document.createElement('button');
-    btn.className='lvl-btn'+(i===lvIdx?' current':'');
-    btn.innerHTML=`<span class="lvl-num">${i+1}</span><span class="lvl-size">${m.size}</span><span class="lvl-diff">${curLang==='id'?m.diffID:m.diff}</span>`;
-    btn.addEventListener('click',()=>{
-      document.getElementById('lvlModal').classList.remove('show');
-      initLevel(i);
-    });
-    grid.appendChild(btn);
-  });
-  document.getElementById('lvlModalTitle').textContent=curLang==='id'?'LEVEL SEÇ':'SELECT LEVEL';
-  document.getElementById('lvlClose').textContent=T().close;
-  document.getElementById('lvlModal').classList.add('show');
-}
-document.getElementById('bLvlSel').addEventListener('click',showLvlModal);
-document.getElementById('lvlClose').addEventListener('click',()=>document.getElementById('lvlModal').classList.remove('show'));
+document.getElementById('bWinNext').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');initLevel(lvIdx+1);});
+document.getElementById('bWinRetry').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');initLevel(lvIdx);});
+document.getElementById('bTimeRetry').addEventListener('click',()=>{document.getElementById('timeoutModal').classList.remove('show');initLevel(lvIdx);});
+document.getElementById('bTimeSkip').addEventListener('click',()=>{document.getElementById('timeoutModal').classList.remove('show');initLevel(lvIdx+1);});
 document.getElementById('bUndo').addEventListener('click',undo);
 document.getElementById('bHint').addEventListener('click',doHint);
 document.getElementById('bSolve').addEventListener('click',doSolve);
+document.getElementById('bPause').addEventListener('click',()=>paused?resumeGame():pauseGame());
+document.getElementById('bResume').addEventListener('click',resumeGame);
 document.getElementById('bLB').addEventListener('click',showLB);
 document.getElementById('lbClose').addEventListener('click',()=>document.getElementById('lbModal').classList.remove('show'));
-document.getElementById('bLang').addEventListener('click',()=>{
-  curLang=curLang==='en'?'id':'en';
-  localStorage.setItem('iqball_lang',curLang);
-  applyLang();
+document.getElementById('bLvlSel').addEventListener('click',showLvlModal);
+document.getElementById('lvlClose').addEventListener('click',()=>document.getElementById('lvlModal').classList.remove('show'));
+document.getElementById('bProfile').addEventListener('click',showProfile);
+document.getElementById('avatarChip').addEventListener('click',showProfile);
+document.getElementById('uname').addEventListener('click',showProfile);
+document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileModal').classList.remove('show'));
+document.getElementById('bSaveName').addEventListener('click',()=>{
+  const name=document.getElementById('profileNameInput').value.trim();
+  if(!name)return;
+  const color=getAvatarColor(name);
+  saveProfile({name,color});
+  localStorage.setItem('iqball_name',name);
+  loadProfile();
+  renderAvatar(name,color,document.getElementById('profileAvatar'),64);
 });
-
+document.getElementById('bMode').addEventListener('click',()=>{
+  timedMode=!timedMode;
+  document.getElementById('bMode').className='hbtn'+(timedMode?' timed':'');
+  document.getElementById('bMode').querySelector('span').textContent=timedMode?T().modeTimed:T().modeNormal;
+  document.getElementById('timLabel').textContent=timedMode?'⏱':T().time;
+  initLevel(lvIdx);
+});
+document.getElementById('bLang').addEventListener('click',()=>{
+  curLang=curLang==='en'?'id':'en';localStorage.setItem('iqball_lang',curLang);applyLang();
+});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){sel=null;buildTray();render();return;}
+  if(e.key==='Escape'){
+    if(paused){resumeGame();return;}
+    sel=null;buildTray();render();return;
+  }
   if(e.ctrlKey&&e.key==='z'){undo();return;}
-  if(sel===null) return;
+  if(e.key===' '){e.preventDefault();paused?resumeGame():pauseGame();return;}
+  if(sel===null)return;
   if(e.key==='r'||e.key==='R'){ps[sel].rot=(ps[sel].rot+1)%4;buildTray();render();}
   if(e.key==='f'||e.key==='F'){ps[sel].flip=!ps[sel].flip;buildTray();render();}
 });
-
 window.addEventListener('resize',()=>{buildBoard();render();});
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════
 // START
-// ═══════════════════════════════════════════
-loadStreak();
-applyLang();
-initLevel(0);
+// ══════════════════════════════════════════
+loadProfile();applyLang();initLevel(0);
 </script>
 </body>
 </html>
