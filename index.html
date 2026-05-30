@@ -426,6 +426,7 @@ function buildBoard(){
       d.addEventListener('mouseenter',()=>{hov=[r,c];render();});
       d.addEventListener('mouseleave',()=>{hov=null;render();});
       d.addEventListener('click',()=>onCell(r,c));
+      d.addEventListener('dblclick',()=>{const pi=board[r][c];if(pi!==null&&pi!==-1&&pi!==-2){pushHistory();remPiece(pi);updRem();buildTray();render();}});
     }
     el.appendChild(d);
   }
