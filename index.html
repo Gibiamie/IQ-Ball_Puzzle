@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IQ Ball Puzzle</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--cs:50px}
@@ -153,14 +152,6 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
 /* ── PROFILE ── */
 .profile-avatar-big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;margin:0 auto 12px;border:3px solid #30363d;overflow:hidden}
 .avatar-img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.google-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;margin:10px 0 4px;border:1px solid #30363d;border-radius:8px;background:#fff;color:#3c4043;font-size:.82rem;font-weight:600;cursor:pointer;transition:box-shadow .15s}
-.google-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.google-btn img{width:18px;height:18px;flex-shrink:0}
-.signout-btn{width:100%;padding:7px;margin-top:6px;border:1px solid #e74c3c33;border-radius:8px;background:transparent;color:#e74c3c;font-size:.75rem;cursor:pointer;transition:background .13s}
-.signout-btn:hover{background:#e74c3c18}
-#googleBadge{display:none;align-items:center;gap:5px;font-size:.6rem;color:#8b949e;margin-bottom:8px;justify-content:center}
-#googleBadge.show{display:flex}
-#googleBadge img{width:12px;height:12px}
 .profile-name-row{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:16px}
 .profile-name-input{background:#0d1117;border:1px solid var(--border);border-radius:6px;color:#e6edf3;padding:4px 8px;font-size:.85rem;text-align:center;width:160px}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -273,16 +264,10 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#e6e
   <div class="modal-box" style="min-width:320px">
     <h3 data-i="profileTitle">My Profile</h3>
     <div id="profileAvatar" class="profile-avatar-big"></div>
-    <div id="googleBadge"><img src="https://www.google.com/favicon.ico"> <span>Signed in with Google</span></div>
     <div class="profile-name-row">
       <input id="profileNameInput" class="profile-name-input" type="text" maxlength="20">
       <button style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#21262d;color:#e6edf3;font-size:.75rem;cursor:pointer" id="bSaveName" data-i="save">Save</button>
     </div>
-    <button class="google-btn" id="bGoogleSignIn">
-      <img src="https://www.google.com/favicon.ico" alt="G">
-      <span id="googleBtnText">Sign in with Google</span>
-    </button>
-    <button class="signout-btn" id="bGoogleSignOut" style="display:none">Sign out</button>
     <div class="stats-grid" id="profileStats"></div>
     <div style="font-size:.65rem;color:#8b949e;margin:6px 0 4px" data-i="bestTimes">Best Times</div>
     <table class="best-times"><thead><tr><th data-i="level">Level</th><th data-i="time">Time</th><th>Mode</th></tr></thead><tbody id="bestTimesBody"></tbody></table>
@@ -651,9 +636,6 @@ function renderLB(){
 // ══════════════════════════════════════════
 // PROFILE
 // ══════════════════════════════════════════
-// ── GOOGLE CLIENT ID ── replace with yours from console.cloud.google.com
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
-
 function getProfile(){return JSON.parse(localStorage.getItem('iqball_profile')||'{"name":"","color":"#e84393"}');}
 function saveProfile(p){localStorage.setItem('iqball_profile',JSON.stringify(p));}
 function getAvatarColor(name){if(!name)return'#636e72';let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%AVATAR_COLORS.length;return AVATAR_COLORS[h];}
@@ -661,17 +643,8 @@ function getAvatarColor(name){if(!name)return'#636e72';let h=0;for(const c of na
 function renderAvatar(name,color,el,size=26){
   el.innerHTML='';
   el.style.width=size+'px';el.style.height=size+'px';
-  const p=getProfile();
-  if(p.picture){
-    el.style.background='transparent';el.style.fontSize='0';
-    const img=document.createElement('img');
-    img.src=p.picture;img.className='avatar-img';
-    img.onerror=()=>{el.style.background=color;el.style.fontSize=(size*.4)+'px';el.textContent=(name||'?')[0].toUpperCase();};
-    el.appendChild(img);
-  } else {
-    el.style.background=color;el.style.fontSize=(size*.4)+'px';
-    el.textContent=(name||'?')[0].toUpperCase();
-  }
+  el.style.background=color;el.style.fontSize=(size*.4)+'px';
+  el.textContent=(name||'?')[0].toUpperCase();
 }
 
 function loadProfile(){
@@ -682,84 +655,12 @@ function loadProfile(){
   document.getElementById('uname').textContent=name||'Player';
 }
 
-// ── GOOGLE SIGN-IN ──
-function initGoogleSignIn(){
-  if(typeof google==='undefined'||!GOOGLE_CLIENT_ID||GOOGLE_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID') return;
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleGoogleSignIn,
-    auto_select: true,
-  });
-  // auto sign-in silently if previously authorized
-  google.accounts.id.prompt();
-}
-
-function handleGoogleSignIn(response){
-  try{
-    const parts=response.credential.split('.');
-    const payload=JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
-    const p=getProfile();
-    p.name=payload.name;
-    p.email=payload.email;
-    p.picture=payload.picture;
-    p.googleId=payload.sub;
-    p.color=getAvatarColor(payload.name);
-    saveProfile(p);
-    localStorage.setItem('iqball_name',payload.name);
-    loadProfile();
-    updateGoogleUI(true);
-  }catch(e){console.error('Google sign-in error',e);}
-}
-
-function triggerGoogleSignIn(){
-  if(typeof google==='undefined'||GOOGLE_CLIENT_ID==='YOUR_GOOGLE_CLIENT_ID'){
-    alert('Google Sign-In is not configured yet.');return;
-  }
-  google.accounts.id.prompt(n=>{
-    if(n.isNotDisplayed()||n.isSkippedMoment()){
-      // fallback: open popup
-      google.accounts.oauth2.initCodeClient({
-        client_id:GOOGLE_CLIENT_ID,
-        scope:'openid profile email',
-        callback:()=>{},
-      });
-    }
-  });
-}
-
-function googleSignOut(){
-  const p=getProfile();
-  delete p.picture;delete p.email;delete p.googleId;
-  saveProfile(p);
-  if(typeof google!=='undefined') google.accounts.id.disableAutoSelect();
-  loadProfile();
-  updateGoogleUI(false);
-}
-
-function updateGoogleUI(signedIn){
-  document.getElementById('bGoogleSignIn').style.display=signedIn?'none':'flex';
-  document.getElementById('bGoogleSignOut').style.display=signedIn?'block':'none';
-  document.getElementById('googleBadge').className=signedIn?'show':'';
-  const ni=document.getElementById('profileNameInput');
-  if(ni) ni.disabled=signedIn;
-  const sb=document.getElementById('bSaveName');
-  if(sb) sb.style.display=signedIn?'none':'inline-block';
-  if(curLang==='id'){
-    document.getElementById('googleBtnText').textContent='Masuk dengan Google';
-    document.getElementById('bGoogleSignOut').textContent='Keluar';
-  } else {
-    document.getElementById('googleBtnText').textContent='Sign in with Google';
-    document.getElementById('bGoogleSignOut').textContent='Sign out';
-  }
-}
-
 function showProfile(){
   const p=getProfile();
   const name=p.name||localStorage.getItem('iqball_name')||'';
   const color=p.color||getAvatarColor(name);
   renderAvatar(name,color,document.getElementById('profileAvatar'),64);
   document.getElementById('profileNameInput').value=name;
-  updateGoogleUI(!!p.googleId);
   // stats
   const scores=getScores();const streak=getStreak();
   const sg=document.getElementById('profileStats');sg.innerHTML='';
@@ -866,8 +767,6 @@ document.getElementById('bSaveName').addEventListener('click',()=>{
   loadProfile();
   renderAvatar(name,p.color,document.getElementById('profileAvatar'),64);
 });
-document.getElementById('bGoogleSignIn').addEventListener('click',triggerGoogleSignIn);
-document.getElementById('bGoogleSignOut').addEventListener('click',googleSignOut);
 document.getElementById('bMode').addEventListener('click',()=>{
   timedMode=!timedMode;
   document.getElementById('bMode').className='hbtn'+(timedMode?' timed':'');
@@ -985,8 +884,6 @@ const _origApplyLang = applyLang;
 applyLang = function(){ _origApplyLang(); applyGuardLang(); };
 
 loadProfile();applyLang();initLevel(0);
-// Init Google Sign-In after GIS script loads
-window.addEventListener('load', initGoogleSignIn);
 </script>
 </body>
 </html>
