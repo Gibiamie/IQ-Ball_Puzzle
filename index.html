@@ -422,6 +422,71 @@ const CHALLENGES=[
    grid:["AABBCC","ADD#EC","FD#GEE","FFGGHH"],
    fixed:['A','H'],shape:'obstacle',
    hints:["A is top-left, H is bottom-right — both fixed","Two obstacles sit in the middle","B and C fill the top row","G bridges across the obstacle gap"]},
+
+  // ── STARTER extra ──
+  {id:9,difficulty:'Starter',num:3,rows:3,cols:4,
+   grid:["AABB","ACBD","CCDD"],
+   fixed:[],shape:'rect',
+   hints:["Simple 3×4 grid","A top-left, D bottom-right mirror each other","B and C fill the center"]},
+
+  {id:10,difficulty:'Starter',num:4,rows:3,cols:5,
+   grid:["AABBC","DABEC","DDEEC"],
+   fixed:[],shape:'rect',
+   hints:["5-column board","Start with the top row","D connects the left side, E the center-right"]},
+
+  {id:11,difficulty:'Starter',num:5,rows:4,cols:4,
+   grid:["ABBC","AABC","DAEC","DDEE"],
+   fixed:[],shape:'rect',
+   hints:["A has 4 cells — place it first","B and C run along the right","D and E mirror each other at the bottom"]},
+
+  // ── JUNIOR extra ──
+  {id:12,difficulty:'Junior',num:3,rows:5,cols:4,
+   grid:["AABB","ACBD","CCED","FEED","FFGG"],
+   fixed:['A'],shape:'rect',
+   hints:["A is fixed top-left","D runs vertically down the right","G is only 2 cells — it fills the bottom-right corner"]},
+
+  {id:13,difficulty:'Junior',num:4,rows:4,cols:5,
+   grid:["AABBC","DAEBC","DDEFC","GGEFF"],
+   fixed:['A','B'],shape:'rect',
+   hints:["A and B are both fixed","C runs down the entire right column","G fills bottom-left, E runs vertically"]},
+
+  // ── EXPERT extra ──
+  {id:14,difficulty:'Expert',num:3,rows:5,cols:5,
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['A','E'],shape:'rect',
+   hints:["A (top-left) and E (right-center) are fixed","D is the largest piece with 4 cells","F forms a vertical column down the center","G and H fill the bottom corners"]},
+
+  {id:15,difficulty:'Expert',num:4,rows:4,cols:5,
+   grid:["AABBC","A#DBC","EDD#C","EEFFF"],
+   fixed:['A'],shape:'obstacle',
+   hints:["A is fixed","Obstacles at (1,1) and (2,3) block two cells","D wraps around the first obstacle","F fills the entire bottom row"]},
+
+  // ── MASTER extra ──
+  {id:16,difficulty:'Master',num:3,rows:5,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGIH","JJKKIH"],
+   fixed:['A','I'],shape:'rect',
+   hints:["A top-left and I bottom-right are fixed","11 pieces on a 5×6 board","H forms a vertical column on the far right","Work outward from both fixed pieces"]},
+
+  // ── WIZARD ──
+  {id:17,difficulty:'Wizard',num:1,rows:4,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGHH"],
+   fixed:['A','H'],shape:'rect',
+   hints:["A top-left, H bottom-right are fixed","8 pieces of 3 cells each on a 4×6 board","All pieces are L or T shaped","Work systematically from both corners inward"]},
+
+  {id:18,difficulty:'Wizard',num:2,rows:5,cols:7,
+   grid:["AABBBCC","AADBECC","FDDEEGC","FFHEGGI","FHHHGII"],
+   fixed:['A','C','G'],shape:'rect',
+   hints:["Three pieces are pre-placed: A, C and G","The largest free piece is F with 5 cells","B connects A to the center area","I and H fill the bottom-right corner"]},
+
+  {id:19,difficulty:'Wizard',num:3,rows:5,cols:5,
+   grid:[".ABB.","AABCC","DDEFC","DEEFF",".EEF."],
+   fixed:['A','B','F'],shape:'cross',
+   hints:["Cross board — 4 corners are missing","A, B and F are all pre-placed","Only D and E remain to be placed","D goes center-left, E fills the bottom-center"]},
+
+  {id:20,difficulty:'Wizard',num:4,rows:4,cols:6,
+   grid:["AABBCC","ADD#EC","FD#GEE","FFGGHH"],
+   fixed:['A','B','H'],shape:'obstacle',
+   hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
 ];
 
 // ═══════════════════════════════════════════════════
