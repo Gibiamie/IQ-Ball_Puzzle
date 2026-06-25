@@ -452,7 +452,7 @@ let currentDiff='Starter',currentChallenge=null;
 let lv,rows,cols,board,ps;
 let sel=null,hov=null,history=[];
 let tmID,t0,elapsed=0,paused=false,hintLevel=0;
-let dragging=null,ghost=null;
+let dragging=null,ghost=null,pointerMoved=false,dragStartX=0,dragStartY=0;
 
 // ═══════════════════════════════════════════════════
 // SCREEN NAVIGATION
@@ -664,8 +664,14 @@ function buildTray(){
       pg.appendChild(b);
     }
     card.appendChild(pg);
-    card.addEventListener('click',()=>selPiece(i));
-    card.addEventListener('pointerdown',e=>{if(ps[i].placed||ps[i].fixed)return;e.preventDefault();sel=i;setTimeout(()=>startDrag(i,e),0);});
+    card.addEventListener('click',()=>{if(!pointerMoved)selPiece(i);});
+    card.addEventListener('pointerdown',e=>{
+      if(ps[i].placed||ps[i].fixed)return;
+      e.preventDefault();
+      dragging=i;pointerMoved=false;
+      dragStartX=e.clientX;dragStartY=e.clientY;
+      if(sel!==i){sel=i;buildTray();render();}
+    });
     const info=document.createElement('div');info.className='pinfo';
     const nm=document.createElement('div');nm.className='pname';nm.textContent=p.letter;
     const btns=document.createElement('div');btns.className='pbtns';
@@ -681,7 +687,7 @@ function buildTray(){
 // ═══════════════════════════════════════════════════
 // GAME LOGIC
 // ═══════════════════════════════════════════════════
-function selPiece(i){if(ps[i].placed||ps[i].fixed)return;sel=i;buildTray();render();}
+function selPiece(i){if(ps[i].placed||ps[i].fixed)return;sel=(sel===i)?null:i;buildTray();render();}
 function canPlace(i,br,bc){
   for(const[r,c]of cellsAt(i,br,bc))
     if(r<0||r>=rows||c<0||c>=cols||board[r][c]!==null)return false;
@@ -910,8 +916,7 @@ function exportDevChallenge(){
 // ═══════════════════════════════════════════════════
 // DRAG & DROP
 // ═══════════════════════════════════════════════════
-function startDrag(i,e){
-  dragging=i;
+function createGhost(i,e){
   if(ghost){ghost.remove();ghost=null;}
   ghost=document.createElement('div');ghost.id='dragGhost';
   const cs=tfm(i);
@@ -937,19 +942,28 @@ function moveGhost(e){
 }
 function endDrag(e){
   if(dragging===null)return;
+  const i=dragging;dragging=null;
   if(ghost){ghost.remove();ghost=null;}
-  const x=e.clientX??(e.changedTouches?.[0]?.clientX??-1);
-  const y=e.clientY??(e.changedTouches?.[0]?.clientY??-1);
-  if(x>=0&&y>=0){
-    const el=document.elementFromPoint(x,y);
-    const cell=el?.closest?.('.cell');
-    if(cell&&!cell.classList.contains('blocked')&&!cell.classList.contains('obstacle')){
-      onCell(+cell.dataset.r,+cell.dataset.c);
+  if(pointerMoved){
+    const x=e.clientX??(e.changedTouches?.[0]?.clientX??-1);
+    const y=e.clientY??(e.changedTouches?.[0]?.clientY??-1);
+    if(x>=0&&y>=0){
+      const el=document.elementFromPoint(x,y);
+      const cell=el?.closest?.('.cell');
+      if(cell&&!cell.classList.contains('blocked')&&!cell.classList.contains('obstacle')){
+        onCell(+cell.dataset.r,+cell.dataset.c);
+      }
     }
   }
-  dragging=null;
+  pointerMoved=false;
 }
-document.addEventListener('pointermove',e=>{if(dragging!==null)moveGhost(e);});
+document.addEventListener('pointermove',e=>{
+  if(dragging===null)return;
+  if(!pointerMoved){
+    const dx=e.clientX-dragStartX,dy=e.clientY-dragStartY;
+    if(Math.hypot(dx,dy)>8){pointerMoved=true;createGhost(dragging,e);}
+  }else moveGhost(e);
+});
 document.addEventListener('pointerup',e=>{if(dragging!==null)endDrag(e);});
 document.addEventListener('touchend',e=>{if(dragging!==null)endDrag(e);},{passive:true});
 
