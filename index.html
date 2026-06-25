@@ -515,6 +515,107 @@ const CHALLENGES=[
    grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
    fixed:[],shape:'pyramid',
    hints:["No pieces pre-placed — build the entire pyramid","Start with A at the top-left column","G fills bottom-right, F fills bottom-left"]},
+
+  // ── STARTER round 2 ──
+  {id:26,difficulty:'Starter',num:6,rows:3,cols:4,
+   grid:["AABC","DABC","DDBC"],
+   fixed:[],shape:'rect',
+   hints:["B and C form identical vertical columns","A top-left, D bottom-left mirror each other","Try placing the columns first"]},
+
+  {id:27,difficulty:'Starter',num:7,rows:3,cols:4,
+   grid:["AABC","DABC","DDBC"],
+   fixed:['C'],shape:'rect',
+   hints:["C is fixed as the right column","A goes top-left, D bottom-left","B fills the remaining center column"]},
+
+  {id:28,difficulty:'Starter',num:8,rows:3,cols:6,
+   grid:["AABBCC","DAEBFC","DDEEFF"],
+   fixed:[],shape:'rect',
+   hints:["Six identical L-shaped pieces","Top row: A, B, C (top-half L's)","Bottom row: D, E, F (bottom-half L's)"]},
+
+  // ── JUNIOR round 2 ──
+  {id:29,difficulty:'Junior',num:5,rows:3,cols:6,
+   grid:["AABBCC","DAEBFC","DDEEFF"],
+   fixed:['A','F'],shape:'rect',
+   hints:["A is top-left, F is bottom-right — both fixed","4 identical L-shapes remain","Fill symmetrically from corners inward"]},
+
+  {id:30,difficulty:'Junior',num:6,rows:3,cols:8,
+   grid:["AABBCCDD","EAFBGCHD","EEFFGGHH"],
+   fixed:['A','H'],shape:'rect',
+   hints:["A top-left and H bottom-right are fixed","8-column board with all L-shaped pieces","Work from fixed corners toward the center"]},
+
+  {id:31,difficulty:'Junior',num:7,rows:4,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGHH"],
+   fixed:['A','B','C','H'],shape:'rect',
+   hints:["Four pieces fixed along top row and bottom-right","D, E, F, G fill the center","D sits below A, E bridges to H"]},
+
+  // ── EXPERT round 2 ──
+  {id:32,difficulty:'Expert',num:5,rows:3,cols:8,
+   grid:["AABBCCDD","EAFBGCHD","EEFFGGHH"],
+   fixed:['A','D'],shape:'rect',
+   hints:["A top-left and D top-right are fixed","6 pieces fill the rest of the 3×8 board","E, F, G, H are all bottom-row L-shapes"]},
+
+  {id:33,difficulty:'Expert',num:6,rows:4,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGHH"],
+   fixed:['A'],shape:'rect',
+   hints:["Only A is fixed in the top-left corner","7 pieces fill the 4×6 board","B fills top-right, H bottom-right, F bottom-left"]},
+
+  {id:34,difficulty:'Expert',num:7,rows:5,cols:5,
+   grid:[".ABB.","AABCC","DDEFC","DEEFF",".EEF."],
+   fixed:['D','F'],shape:'cross',
+   hints:["Cross-shaped board with D and F both fixed","D is on the left side, F on the right","A, B, C, E fill the remaining cross cells"]},
+
+  // ── MASTER round 2 ──
+  {id:35,difficulty:'Master',num:4,rows:4,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGHH"],
+   fixed:['A','B'],shape:'rect',
+   hints:["A and B fixed across the top portion","6 free pieces remain","H fills bottom-right, F bottom-left, G center-bottom"]},
+
+  {id:36,difficulty:'Master',num:5,rows:5,cols:5,
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['A','E','F'],shape:'rect',
+   hints:["A top-left, E right column, F center column — all fixed","B, C, D, G, H must fill around them","D is the largest piece (4 cells)"]},
+
+  {id:37,difficulty:'Master',num:6,rows:5,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGIH","JJKKIH"],
+   fixed:['J','K'],shape:'rect',
+   hints:["J and K are fixed at the bottom of the 5×6 board","9 free pieces remain","H forms a vertical column on the far right"]},
+
+  // ── WIZARD round 2 ──
+  {id:38,difficulty:'Wizard',num:5,rows:4,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGHH"],
+   fixed:['A','B','C'],shape:'rect',
+   hints:["Three pieces fixed across the entire top row","D, E, F, G, H fill below — 5 free pieces","H goes bottom-right, F bottom-left"]},
+
+  {id:39,difficulty:'Wizard',num:6,rows:5,cols:5,
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['A','E'],shape:'rect',
+   hints:["A top-left and E right-center column are both fixed","6 pieces fill around them on this 5×5 board","D with 4 cells is the hardest to place"]},
+
+  {id:40,difficulty:'Wizard',num:7,rows:5,cols:6,
+   grid:["AABBCC","ADDBEC","FDGEEH","FFGGIH","JJKKIH"],
+   fixed:['A','I'],shape:'rect',
+   hints:["A top-left and I bottom-right area are fixed","9 free pieces on the 5×6 board","H forms a vertical column on the far right"]},
+
+  // ── PYRAMID round 2 (5-row, 15 cells) ──
+  {id:41,difficulty:'Starter',num:'🔺P3',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:['A','B','C','D'],shape:'pyramid',
+   hints:["Smaller 5-row pyramid with 5 pieces","Only E remains — place at the bottom-right corner"]},
+
+  {id:42,difficulty:'Junior',num:'🔺P4',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:['A','C'],shape:'pyramid',
+   hints:["A is the left column, C is the bottom-left L","B, D, E fill the remaining 9 cells","D is the center column"]},
+
+  {id:43,difficulty:'Expert',num:'🔺P5',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:['A'],shape:'pyramid',
+   hints:["Only A is pre-placed as the left edge column","B, C, D, E fill the right portion","B connects to A's column going right"]},
+
+  {id:44,difficulty:'Wizard',num:'🔺P6',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:[],shape:'pyramid',
+   hints:["No pieces pre-placed — build the 5-row pyramid from scratch","A forms the left edge column","E fills the bottom-right corner"]},
 ];
 
 // ═══════════════════════════════════════════════════
