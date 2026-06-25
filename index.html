@@ -193,6 +193,9 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 @media(max-width:360px){#gPanel{width:126px;min-width:126px}}
 @keyframes timedFlash{0%,100%{opacity:1}50%{opacity:.35}}
 .timer-warn{animation:timedFlash .8s ease-in-out infinite}
+#dragGhost{position:fixed;pointer-events:none;z-index:999;opacity:.82;transform:translate(-50%,-50%);display:grid;gap:4px}
+#dragGhost .gdot{border-radius:50%;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+.pcard{touch-action:none}
 </style>
 </head>
 <body>
@@ -449,6 +452,7 @@ let currentDiff='Starter',currentChallenge=null;
 let lv,rows,cols,board,ps;
 let sel=null,hov=null,history=[];
 let tmID,t0,elapsed=0,paused=false,hintLevel=0;
+let dragging=null,ghost=null;
 
 // ═══════════════════════════════════════════════════
 // SCREEN NAVIGATION
@@ -658,6 +662,7 @@ function buildTray(){
     }
     card.appendChild(pg);
     card.addEventListener('click',()=>selPiece(i));
+    card.addEventListener('pointerdown',e=>{if(ps[i].placed||ps[i].fixed)return;e.preventDefault();sel=i;setTimeout(()=>startDrag(i,e),0);});
     const info=document.createElement('div');info.className='pinfo';
     const nm=document.createElement('div');nm.className='pname';nm.textContent=p.letter;
     const btns=document.createElement('div');btns.className='pbtns';
@@ -680,7 +685,13 @@ function canPlace(i,br,bc){
   return true;
 }
 function onCell(r,c){
-  if(sel===null||paused)return;
+  if(paused)return;
+  const pi=board[r][c];
+  // Click on a placed non-fixed piece = pick it up and auto-select
+  if(sel===null&&pi!==null&&pi>=0&&!ps[pi].fixed){
+    pushHistory();remPiece(pi);sel=pi;hov=null;updRem();buildTray();render();return;
+  }
+  if(sel===null)return;
   if(!canPlace(sel,r,c)){const el=gc(r,c);if(el){el.classList.add('bad');setTimeout(()=>render(),350);}return;}
   pushHistory();
   for(const[pr,pc]of cellsAt(sel,r,c))board[pr][pc]=sel;
@@ -777,8 +788,7 @@ function refreshHomeStats(){
 // ═══════════════════════════════════════════════════
 function getScores(){return JSON.parse(localStorage.getItem('iqball_scores')||'[]');}
 function saveScore(secs){
-  let name=localStorage.getItem('iqball_name');
-  if(name===null){name=(prompt('Your name for the leaderboard (blank to skip):','')||'').trim();localStorage.setItem('iqball_name',name||'');}
+  let name=localStorage.getItem('iqball_name')||'';
   if(!name)return;
   const scores=getScores();
   scores.push({name,chalId:currentChallenge.id,level:`${currentChallenge.difficulty} #${currentChallenge.num}`,time:secs,date:new Date().toISOString().slice(0,10)});
@@ -879,6 +889,52 @@ function exportDevChallenge(){
   document.getElementById('devExport').value=JSON.stringify(obj,null,2);
   window._devChallenge=obj;
 }
+
+// ═══════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════
+function startDrag(i,e){
+  dragging=i;
+  if(ghost){ghost.remove();ghost=null;}
+  ghost=document.createElement('div');ghost.id='dragGhost';
+  const cs=tfm(i);
+  const mr=Math.max(...cs.map(([r])=>r)),mc=Math.max(...cs.map(([,c])=>c));
+  const occ=new Set(cs.map(([r,c])=>`${r},${c}`));
+  const sz=Math.max(24,parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cs'))||36);
+  ghost.style.gridTemplateRows=`repeat(${mr+1},${sz}px)`;
+  ghost.style.gridTemplateColumns=`repeat(${mc+1},${sz}px)`;
+  for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
+    const d=document.createElement('div');d.className='gdot';
+    d.style.width=sz+'px';d.style.height=sz+'px';
+    d.style.background=occ.has(`${r},${c}`)?`radial-gradient(circle at 33% 27%,rgba(255,255,255,.6) 0%,${COL[lv.pieces[i].color]} 42%,${COL[lv.pieces[i].color]}99 100%)`:'transparent';
+    ghost.appendChild(d);
+  }
+  document.body.appendChild(ghost);
+  moveGhost(e);
+}
+function moveGhost(e){
+  if(!ghost)return;
+  const x=e.clientX??(e.touches?.[0]?.clientX??0);
+  const y=e.clientY??(e.touches?.[0]?.clientY??0);
+  ghost.style.left=x+'px';ghost.style.top=y+'px';
+}
+function endDrag(e){
+  if(dragging===null)return;
+  if(ghost){ghost.remove();ghost=null;}
+  const x=e.clientX??(e.changedTouches?.[0]?.clientX??-1);
+  const y=e.clientY??(e.changedTouches?.[0]?.clientY??-1);
+  if(x>=0&&y>=0){
+    const el=document.elementFromPoint(x,y);
+    const cell=el?.closest?.('.cell');
+    if(cell&&!cell.classList.contains('blocked')&&!cell.classList.contains('obstacle')){
+      onCell(+cell.dataset.r,+cell.dataset.c);
+    }
+  }
+  dragging=null;
+}
+document.addEventListener('pointermove',e=>{if(dragging!==null)moveGhost(e);});
+document.addEventListener('pointerup',e=>{if(dragging!==null)endDrag(e);});
+document.addEventListener('touchend',e=>{if(dragging!==null)endDrag(e);},{passive:true});
 
 // ═══════════════════════════════════════════════════
 // EVENTS
