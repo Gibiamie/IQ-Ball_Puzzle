@@ -487,6 +487,34 @@ const CHALLENGES=[
    grid:["AABBCC","ADD#EC","FD#GEE","FFGGHH"],
    fixed:['A','B','H'],shape:'obstacle',
    hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
+
+  // ── PYRAMID (3D) ──
+  // 6-row triangle: row r has (r+1) cells, total 21 cells, 7 pieces of 3 each
+  // Solution: A=left-edge col, B=top-right L, C/D/E=middle row, F/G=bottom halves
+  {id:21,difficulty:'Starter',num:'🔺1',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A','B','C','D','E','F'],shape:'pyramid',
+   hints:["Only G remains — place it at the bottom-right","G is a 3-cell horizontal piece"]},
+
+  {id:22,difficulty:'Junior',num:'🔺2',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A','B','E','F'],shape:'pyramid',
+   hints:["C and D fill the left-center area","G goes at the bottom-right"]},
+
+  {id:23,difficulty:'Expert',num:'🔺3',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A','G'],shape:'pyramid',
+   hints:["A is the left column, G the bottom-right strip","Work inward — B connects to A's column","F fills the bottom-left"]},
+
+  {id:24,difficulty:'Master',num:'🔺4',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A'],shape:'pyramid',
+   hints:["Only A is fixed at the left edge","Fill 6 remaining pieces in the pyramid","B connects to A going right"]},
+
+  {id:25,difficulty:'Wizard',num:'🔺5',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:[],shape:'pyramid',
+   hints:["No pieces pre-placed — build the entire pyramid","Start with A at the top-left column","G fills bottom-right, F fills bottom-left"]},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -507,6 +535,10 @@ function parseLevel(raw){
     const mr=Math.min(...abs.map(([r])=>r)),mc=Math.min(...abs.map(([,c])=>c));
     return{letter:ch,color:LC[ch]||'R',cells:abs.map(([r,c])=>[r-mr,c-mc]),solveR:mr,solveC:mc};
   });
+  // For pyramid, mark cells where c > r as blocked (outside the triangle)
+  if(shape==='pyramid'){
+    for(let r=0;r<rows;r++)for(let c=r+1;c<cols;c++)blocked.add(`${r},${c}`);
+  }
   return{rows,cols,pieces,blocked,obstacles,shape};
 }
 
@@ -639,6 +671,41 @@ function buildBoard(){
   document.documentElement.style.setProperty('--cs',sz+'px');
   el.style.gridTemplateColumns=`repeat(${cols},var(--cs))`;
   el.innerHTML='';
+
+  // ── PYRAMID LAYOUT ──
+  if(lv.shape==='pyramid'){
+    el.style.gridTemplateColumns='unset';
+    el.style.display='flex';
+    el.style.flexDirection='column';
+    el.style.alignItems='center';
+    el.style.gap='5px';
+    const mkCell=(r,c)=>{
+      const d=document.createElement('div');
+      d.className='cell';d.dataset.r=r;d.dataset.c=c;
+      d.addEventListener('mouseenter',()=>{hov=[r,c];render();});
+      d.addEventListener('mouseleave',()=>{hov=null;render();});
+      d.addEventListener('click',()=>onCell(r,c));
+      d.addEventListener('dblclick',()=>{
+        const pi=board[r][c];
+        if(pi!==null&&pi>=0&&!ps[pi].fixed){pushHistory();remPiece(pi);updRem();buildTray();render();}
+      });
+      return d;
+    };
+    for(let r=0;r<rows;r++){
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;gap:5px;';
+      for(let c=0;c<=r;c++)row.appendChild(mkCell(r,c));
+      el.appendChild(row);
+    }
+    el.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      const t=e.target.closest('.cell');if(!t)return;
+      const pi=board[+t.dataset.r][+t.dataset.c];
+      if(pi!==null&&pi>=0&&!ps[pi].fixed){pushHistory();remPiece(pi);updRem();buildTray();render();}
+    });
+    return;
+  }
+
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const d=document.createElement('div');
     d.className='cell';d.dataset.r=r;d.dataset.c=c;
