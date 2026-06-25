@@ -681,7 +681,7 @@ function buildTray(){
 // ═══════════════════════════════════════════════════
 // GAME LOGIC
 // ═══════════════════════════════════════════════════
-function selPiece(i){if(ps[i].placed||ps[i].fixed)return;sel=(sel===i)?null:i;buildTray();render();}
+function selPiece(i){if(ps[i].placed||ps[i].fixed)return;sel=i;buildTray();render();}
 function canPlace(i,br,bc){
   for(const[r,c]of cellsAt(i,br,bc))
     if(r<0||r>=rows||c<0||c>=cols||board[r][c]!==null)return false;
