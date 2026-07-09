@@ -488,33 +488,37 @@ const CHALLENGES=[
    fixed:['A','B','H'],shape:'obstacle',
    hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
 
-  // ── PYRAMID (3D) ──
-  // 6-row triangle: row r has (r+1) cells, total 21 cells, 7 pieces of 3 each
-  // Solution: A=left-edge col, B=top-right L, C/D/E=middle row, F/G=bottom halves
-  {id:21,difficulty:'Starter',num:'🔺1',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A','B','C','D','E','F'],shape:'pyramid',
-   hints:["Only G remains — place it at the bottom-right","G is a 3-cell horizontal piece"]},
+  // ── PYRAMID ──
+  // 4-row (10 cells): A=4 cells left column, B=3 top-right L, C=3 bottom strip
+  // grid: ["A","AB","ABB","ACCC"]
+  {id:21,difficulty:'Starter',num:'🔺1',rows:4,cols:4,
+   grid:["A","AB","ABB","ACCC"],
+   fixed:['A','B'],shape:'pyramid',
+   hints:["4-row pyramid — only C remains to place","C is the 3-cell bottom-right strip"]},
 
-  {id:22,difficulty:'Junior',num:'🔺2',rows:6,cols:6,
+  {id:22,difficulty:'Starter',num:'🔺2',rows:4,cols:4,
+   grid:["A","AB","ABB","ACCC"],
+   fixed:['A'],shape:'pyramid',
+   hints:["4-row pyramid — A is fixed as the left column","Place B in the upper-right area","C fills the bottom-right strip"]},
+
+  // 5-row (15 cells): A,B,C,D,E each 3 cells
+  // grid: ["A","AB","ABD","CBDE","CCDEE"]
+  {id:23,difficulty:'Junior',num:'🔺3',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:['A','B','C','D'],shape:'pyramid',
+   hints:["5-row pyramid — 4 pieces fixed","Only E remains — it goes at the bottom-right corner"]},
+
+  {id:24,difficulty:'Junior',num:'🔺4',rows:5,cols:5,
+   grid:["A","AB","ABD","CBDE","CCDEE"],
+   fixed:['A','C'],shape:'pyramid',
+   hints:["A is the left column, C is the bottom-left L","B, D, E fill the remaining cells","D runs vertically through the center"]},
+
+  // 6-row (21 cells): A,B,C,D,E,F,G each 3 cells
+  // grid: ["A","AB","ABB","CDDE","CCDEE","FFFGGG"]
+  {id:25,difficulty:'Expert',num:'🔺5',rows:6,cols:6,
    grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
    fixed:['A','B','E','F'],shape:'pyramid',
-   hints:["C and D fill the left-center area","G goes at the bottom-right"]},
-
-  {id:23,difficulty:'Expert',num:'🔺3',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A','G'],shape:'pyramid',
-   hints:["A is the left column, G the bottom-right strip","Work inward — B connects to A's column","F fills the bottom-left"]},
-
-  {id:24,difficulty:'Master',num:'🔺4',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A'],shape:'pyramid',
-   hints:["Only A is fixed at the left edge","Fill 6 remaining pieces in the pyramid","B connects to A going right"]},
-
-  {id:25,difficulty:'Wizard',num:'🔺5',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:[],shape:'pyramid',
-   hints:["No pieces pre-placed — build the entire pyramid","Start with A at the top-left column","G fills bottom-right, F fills bottom-left"]},
+   hints:["6-row pyramid — A, B, E, F are fixed","C and D fill the middle section","G fills the bottom-right half"]},
 
   // ── STARTER round 2 ──
   {id:26,difficulty:'Starter',num:6,rows:3,cols:4,
@@ -596,26 +600,31 @@ const CHALLENGES=[
    fixed:['A','I'],shape:'rect',
    hints:["A top-left and I bottom-right area are fixed","9 free pieces on the 5×6 board","H forms a vertical column on the far right"]},
 
-  // ── PYRAMID round 2 (5-row, 15 cells) ──
-  {id:41,difficulty:'Starter',num:'🔺P3',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
-   fixed:['A','B','C','D'],shape:'pyramid',
-   hints:["Smaller 5-row pyramid with 5 pieces","Only E remains — place at the bottom-right corner"]},
-
-  {id:42,difficulty:'Junior',num:'🔺P4',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
-   fixed:['A','C'],shape:'pyramid',
-   hints:["A is the left column, C is the bottom-left L","B, D, E fill the remaining 9 cells","D is the center column"]},
-
-  {id:43,difficulty:'Expert',num:'🔺P5',rows:5,cols:5,
+  // ── PYRAMID round 2 ──
+  {id:41,difficulty:'Expert',num:'🔺6',rows:5,cols:5,
    grid:["A","AB","ABD","CBDE","CCDEE"],
    fixed:['A'],shape:'pyramid',
-   hints:["Only A is pre-placed as the left edge column","B, C, D, E fill the right portion","B connects to A's column going right"]},
+   hints:["5-row pyramid — only A is fixed as the left column","B, C, D, E fill the rest","D is the vertical center column"]},
 
-  {id:44,difficulty:'Wizard',num:'🔺P6',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
+  {id:42,difficulty:'Master',num:'🔺7',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A','F'],shape:'pyramid',
+   hints:["6-row pyramid — A (left col) and F (bottom-left) are fixed","5 free pieces remain","G goes bottom-right, B sits in upper-right"]},
+
+  {id:43,difficulty:'Master',num:'🔺8',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['A'],shape:'pyramid',
+   hints:["6-row pyramid — only A is fixed","6 free pieces: start with G at the bottom-right","Then F bottom-left, B upper-right, C/D/E in the middle"]},
+
+  {id:44,difficulty:'Wizard',num:'🔺9',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+   fixed:['G'],shape:'pyramid',
+   hints:["6-row pyramid — only G (bottom-right strip) is fixed","6 free pieces to place","A goes up the left edge, F on the bottom-left"]},
+
+  {id:45,difficulty:'Wizard',num:'🔺10',rows:6,cols:6,
+   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
    fixed:[],shape:'pyramid',
-   hints:["No pieces pre-placed — build the 5-row pyramid from scratch","A forms the left edge column","E fills the bottom-right corner"]},
+   hints:["6-row pyramid — no pieces pre-placed","Build the entire 21-cell pyramid from scratch","A fills the left edge, G and F fill the bottom row"]},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -770,6 +779,8 @@ function buildBoard(){
   const ah=window.innerHeight-document.getElementById('gHdr').offsetHeight-22;
   const sz=Math.min(54,Math.floor(Math.min(aw/cols,ah/rows))-5);
   document.documentElement.style.setProperty('--cs',sz+'px');
+  // Reset any pyramid flex styles from previous board
+  el.style.display='';el.style.flexDirection='';el.style.alignItems='';
   el.style.gridTemplateColumns=`repeat(${cols},var(--cs))`;
   el.innerHTML='';
 
