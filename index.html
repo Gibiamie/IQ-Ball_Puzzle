@@ -488,37 +488,31 @@ const CHALLENGES=[
    fixed:['A','B','H'],shape:'obstacle',
    hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
 
-  // ── PYRAMID ──
-  // 4-row (10 cells): A=4 cells left column, B=3 top-right L, C=3 bottom strip
-  // grid: ["A","AB","ABB","ACCC"]
-  {id:21,difficulty:'Starter',num:'🔺1',rows:4,cols:4,
-   grid:["A","AB","ABB","ACCC"],
-   fixed:['A','B'],shape:'pyramid',
-   hints:["4-row pyramid — only C remains to place","C is the 3-cell bottom-right strip"]},
+  // ── PYRAMID ── 5-row (15 cells), 5 triomino pieces each
+  {id:21,difficulty:'Starter',num:'🔺1',rows:5,cols:5,
+   grid:["A","AB","ABC","DBCE","DDCEE"],
+   fixed:['A','B','C'],shape:'pyramid',
+   hints:["Three vertical columns (A, B, C) are pre-placed","D and E are both L-shaped — they fit in the two lower corners","D goes bottom-left, E goes bottom-right"]},
 
-  {id:22,difficulty:'Starter',num:'🔺2',rows:4,cols:4,
-   grid:["A","AB","ABB","ACCC"],
-   fixed:['A'],shape:'pyramid',
-   hints:["4-row pyramid — A is fixed as the left column","Place B in the upper-right area","C fills the bottom-right strip"]},
+  {id:22,difficulty:'Starter',num:'🔺2',rows:5,cols:5,
+   grid:["A","AB","ABB","CCCD","EEEDD"],
+   fixed:['A','B','C'],shape:'pyramid',
+   hints:["Left column A, upper-right L piece B, and middle row C are fixed","E is a horizontal row — it fits along the bottom-left","D is an L-shape in the bottom-right corner"]},
 
-  // 5-row (15 cells): A,B,C,D,E each 3 cells
-  // grid: ["A","AB","ABD","CBDE","CCDEE"]
   {id:23,difficulty:'Junior',num:'🔺3',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
-   fixed:['A','B','C','D'],shape:'pyramid',
-   hints:["5-row pyramid — 4 pieces fixed","Only E remains — it goes at the bottom-right corner"]},
+   grid:["A","AB","ABB","CDDE","CCDEE"],
+   fixed:['A','B'],shape:'pyramid',
+   hints:["A (left column) and B (upper-right L) are fixed","Three L-shapes remain to fill the lower triangle","C goes bottom-left, D bridges the middle, E bottom-right"]},
 
   {id:24,difficulty:'Junior',num:'🔺4',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
-   fixed:['A','C'],shape:'pyramid',
-   hints:["A is the left column, C is the bottom-left L","B, D, E fill the remaining cells","D runs vertically through the center"]},
+   grid:["A","AA","BCD","BCDE","BCDEE"],
+   fixed:['A','B'],shape:'pyramid',
+   hints:["A (top L-shape) and B (left column rows 2–4) are fixed","C and D are vertical columns — fill columns 1 and 2","E is an L-shape fitting in the bottom-right corner"]},
 
-  // 6-row (21 cells): A,B,C,D,E,F,G each 3 cells
-  // grid: ["A","AB","ABB","CDDE","CCDEE","FFFGGG"]
-  {id:25,difficulty:'Expert',num:'🔺5',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A','B','E','F'],shape:'pyramid',
-   hints:["6-row pyramid — A, B, E, F are fixed","C and D fill the middle section","G fills the bottom-right half"]},
+  {id:25,difficulty:'Expert',num:'🔺5',rows:5,cols:5,
+   grid:["A","AA","BCC","BCDE","BDDEE"],
+   fixed:['A'],shape:'pyramid',
+   hints:["Only A (the top L-shape) is fixed","B fills the left column in rows 2–4","C, D, E are L-shapes filling the lower-right area"]},
 
   // ── STARTER round 2 ──
   {id:26,difficulty:'Starter',num:6,rows:3,cols:4,
@@ -602,29 +596,29 @@ const CHALLENGES=[
 
   // ── PYRAMID round 2 ──
   {id:41,difficulty:'Expert',num:'🔺6',rows:5,cols:5,
-   grid:["A","AB","ABD","CBDE","CCDEE"],
+   grid:["A","AA","BBB","CCCD","EEEDD"],
    fixed:['A'],shape:'pyramid',
-   hints:["5-row pyramid — only A is fixed as the left column","B, C, D, E fill the rest","D is the vertical center column"]},
+   hints:["Only A (top-left L-piece) is fixed","B, C, E are all horizontal rows of 3 cells","D is an L-shape in the bottom-right corner"]},
 
-  {id:42,difficulty:'Master',num:'🔺7',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A','F'],shape:'pyramid',
-   hints:["6-row pyramid — A (left col) and F (bottom-left) are fixed","5 free pieces remain","G goes bottom-right, B sits in upper-right"]},
-
-  {id:43,difficulty:'Master',num:'🔺8',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['A'],shape:'pyramid',
-   hints:["6-row pyramid — only A is fixed","6 free pieces: start with G at the bottom-right","Then F bottom-left, B upper-right, C/D/E in the middle"]},
-
-  {id:44,difficulty:'Wizard',num:'🔺9',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
-   fixed:['G'],shape:'pyramid',
-   hints:["6-row pyramid — only G (bottom-right strip) is fixed","6 free pieces to place","A goes up the left edge, F on the bottom-left"]},
-
-  {id:45,difficulty:'Wizard',num:'🔺10',rows:6,cols:6,
-   grid:["A","AB","ABB","CDDE","CCDEE","FFFGGG"],
+  {id:42,difficulty:'Master',num:'🔺7',rows:5,cols:5,
+   grid:["A","AA","BBB","CDDE","CCDEE"],
    fixed:[],shape:'pyramid',
-   hints:["6-row pyramid — no pieces pre-placed","Build the entire 21-cell pyramid from scratch","A fills the left edge, G and F fill the bottom row"]},
+   hints:["No pieces are pre-placed — build the entire pyramid","A is the top L-piece; B is a horizontal row in row 2","C, D, E are L-shapes filling the lower triangle"]},
+
+  {id:43,difficulty:'Master',num:'🔺8',rows:5,cols:5,
+   grid:["A","AA","BCC","BBCD","EEEDD"],
+   fixed:[],shape:'pyramid',
+   hints:["No pieces pre-placed — place all 5 pieces","A is the top-left L; E is a horizontal row on the bottom-left","B and C are interlocking L-shapes; D is the bottom-right corner"]},
+
+  {id:44,difficulty:'Wizard',num:'🔺9',rows:5,cols:5,
+   grid:["A","AA","BBC","BDCE","DDCEE"],
+   fixed:[],shape:'pyramid',
+   hints:["No pieces pre-placed — expert arrangement","A is the top-left L; C is a vertical column down the center","B and D are interlocking L-shapes on the left side"]},
+
+  {id:45,difficulty:'Wizard',num:'🔺10',rows:5,cols:5,
+   grid:["A","AA","BBC","DBCE","DDCEE"],
+   fixed:[],shape:'pyramid',
+   hints:["No pieces pre-placed — the ultimate pyramid challenge","A is the top-left L; C is the center vertical column","B sits in the middle-left area; D and E are corner L-shapes"]},
 ];
 
 // ═══════════════════════════════════════════════════
