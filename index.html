@@ -899,27 +899,13 @@ function buildTray(){
     const card=document.createElement('div');
     card.className='pcard'+(ps[i].placed?' placed':sel===i?' sel':'');
     const pg=document.createElement('div');pg.className='pgrid';
-    if(lv&&lv.shape==='pyramid'){
-      pg.style.display='flex';pg.style.flexDirection='column';pg.style.alignItems='center';pg.style.gap='2px';
-      for(let r=0;r<=mr;r++){
-        const rowEl=document.createElement('div');rowEl.style.cssText='display:flex;gap:2px;';
-        for(let c=0;c<=r;c++){
-          const b=document.createElement('div');b.className='pdot';
-          if(occ.has(`${r},${c}`)){b.style.background=`radial-gradient(circle at 33% 28%,rgba(255,255,255,.5) 0%,${hex} 55%)`;b.style.boxShadow='0 2px 4px rgba(0,0,0,.4)';}
-          else b.style.background='rgba(255,255,255,0.05)';
-          rowEl.appendChild(b);
-        }
-        pg.appendChild(rowEl);
-      }
-    }else{
-      pg.style.gridTemplateRows=`repeat(${mr+1},17px)`;
-      pg.style.gridTemplateColumns=`repeat(${mc+1},17px)`;
-      for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
-        const b=document.createElement('div');b.className='pdot';
-        if(occ.has(`${r},${c}`)){b.style.background=`radial-gradient(circle at 33% 28%,rgba(255,255,255,.5) 0%,${hex} 55%)`;b.style.boxShadow='0 2px 4px rgba(0,0,0,.4)';}
-        else b.style.background='transparent';
-        pg.appendChild(b);
-      }
+    pg.style.gridTemplateRows=`repeat(${mr+1},17px)`;
+    pg.style.gridTemplateColumns=`repeat(${mc+1},17px)`;
+    for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
+      const b=document.createElement('div');b.className='pdot';
+      if(occ.has(`${r},${c}`)){b.style.background=`radial-gradient(circle at 33% 28%,rgba(255,255,255,.5) 0%,${hex} 55%)`;b.style.boxShadow='0 2px 4px rgba(0,0,0,.4)';}
+      else b.style.background='transparent';
+      pg.appendChild(b);
     }
     card.appendChild(pg);
     card.addEventListener('click',()=>{if(!pointerMoved)selPiece(i);});
@@ -1181,28 +1167,13 @@ function createGhost(i,e){
   const mr=Math.max(...cs.map(([r])=>r)),mc=Math.max(...cs.map(([,c])=>c));
   const occ=new Set(cs.map(([r,c])=>`${r},${c}`));
   const sz=Math.max(24,parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cs'))||36);
-  if(lv&&lv.shape==='pyramid'){
-    ghost.style.display='flex';ghost.style.flexDirection='column';ghost.style.alignItems='center';ghost.style.gap=sz*0.1+'px';
-    for(let r=0;r<=mr;r++){
-      const rowEl=document.createElement('div');rowEl.style.cssText=`display:flex;gap:${sz*0.1}px;`;
-      for(let c=0;c<=r;c++){
-        const d=document.createElement('div');d.className='gdot';
-        d.style.width=sz+'px';d.style.height=sz+'px';
-        d.style.borderRadius='50%';
-        d.style.background=occ.has(`${r},${c}`)?`radial-gradient(circle at 33% 27%,rgba(255,255,255,.6) 0%,${COL[lv.pieces[i].color]} 42%,${COL[lv.pieces[i].color]}99 100%)`:'transparent';
-        rowEl.appendChild(d);
-      }
-      ghost.appendChild(rowEl);
-    }
-  }else{
-    ghost.style.gridTemplateRows=`repeat(${mr+1},${sz}px)`;
-    ghost.style.gridTemplateColumns=`repeat(${mc+1},${sz}px)`;
-    for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
-      const d=document.createElement('div');d.className='gdot';
-      d.style.width=sz+'px';d.style.height=sz+'px';
-      d.style.background=occ.has(`${r},${c}`)?`radial-gradient(circle at 33% 27%,rgba(255,255,255,.6) 0%,${COL[lv.pieces[i].color]} 42%,${COL[lv.pieces[i].color]}99 100%)`:'transparent';
-      ghost.appendChild(d);
-    }
+  ghost.style.gridTemplateRows=`repeat(${mr+1},${sz}px)`;
+  ghost.style.gridTemplateColumns=`repeat(${mc+1},${sz}px)`;
+  for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
+    const d=document.createElement('div');d.className='gdot';
+    d.style.width=sz+'px';d.style.height=sz+'px';
+    d.style.background=occ.has(`${r},${c}`)?`radial-gradient(circle at 33% 27%,rgba(255,255,255,.6) 0%,${COL[lv.pieces[i].color]} 42%,${COL[lv.pieces[i].color]}99 100%)`:'transparent';
+    ghost.appendChild(d);
   }
   document.body.appendChild(ghost);
   moveGhost(e);
