@@ -212,6 +212,7 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 #dragGhost .gdot{border-radius:50%;box-shadow:0 3px 10px rgba(0,0,0,.5)}
 .pcard{touch-action:none}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -415,6 +416,83 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════
+// SUPABASE CONFIG
+// Fill in your values from supabase.com → Project Settings → API
+// ═══════════════════════════════════════════════════
+const SUPABASE_URL  = '';   // e.g. 'https://xxxx.supabase.co'
+const SUPABASE_ANON = '';   // e.g. 'eyJhbGc...'
+
+let _sb = null;      // Supabase client
+let _sbUser = null;  // Signed-in user object
+
+function sbInit(){
+  if(!SUPABASE_URL||!SUPABASE_ANON)return;
+  _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  _sb.auth.onAuthStateChange(async(event, session)=>{
+    _sbUser = session?.user || null;
+    if(_sbUser){
+      const meta = _sbUser.user_metadata||{};
+      const p = {
+        name: meta.full_name||meta.name||_sbUser.email,
+        email: _sbUser.email,
+        picture: meta.avatar_url||meta.picture||'',
+        color: getAvColor(meta.full_name||_sbUser.email)
+      };
+      saveProfile(p);loadAvatarChip();
+      await sbSyncCompleted();
+    }
+  });
+  // Handle OAuth redirect token
+  _sb.auth.getSession().then(({data})=>{
+    _sbUser = data.session?.user||null;
+    if(_sbUser){ const meta=_sbUser.user_metadata||{};
+      saveProfile({name:meta.full_name||meta.name||_sbUser.email,email:_sbUser.email,picture:meta.avatar_url||meta.picture||'',color:getAvColor(meta.full_name||_sbUser.email)});
+      loadAvatarChip();
+    }
+  });
+}
+
+async function sbSignInGoogle(){
+  if(!_sb){alert('Supabase yapılandırılmamış.\nSUPABASE_URL ve SUPABASE_ANON sabitlerini doldurun.');return;}
+  await _sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
+}
+
+async function sbSignOut(){
+  if(_sb)await _sb.auth.signOut();
+  _sbUser=null;
+  localStorage.removeItem('iqball_profile');localStorage.removeItem('iqball_name');
+  loadAvatarChip();
+}
+
+async function sbSaveScore(chalId,timeSecs,level){
+  if(!_sb||!_sbUser)return;
+  const meta=_sbUser.user_metadata||{};
+  await _sb.from('scores').insert({
+    user_id:_sbUser.id,
+    display_name:meta.full_name||meta.name||_sbUser.email,
+    avatar_url:meta.avatar_url||meta.picture||null,
+    chal_id:chalId, level, time_secs:timeSecs
+  });
+}
+
+async function sbSaveCompleted(chalId,bestTime){
+  if(!_sb||!_sbUser)return;
+  await _sb.from('completed').upsert({user_id:_sbUser.id,chal_id:chalId,best_time:bestTime},{onConflict:'user_id,chal_id'});
+}
+
+async function sbSyncCompleted(){
+  if(!_sb||!_sbUser)return;
+  const {data}=await _sb.from('completed').select('chal_id').eq('user_id',_sbUser.id);
+  if(data)data.forEach(r=>markCompleted(r.chal_id));
+}
+
+async function sbGetLeaderboard(chalId){
+  if(!_sb)return null;
+  const {data,error}=await _sb.from('leaderboard').select('display_name,avatar_url,time_secs,scored_date').eq('chal_id',chalId).order('time_secs',{ascending:true}).limit(5);
+  return error?null:data;
+}
+
 // ═══════════════════════════════════════════════════
 // COLORS
 // ═══════════════════════════════════════════════════
@@ -1075,7 +1153,7 @@ function fmt(s){return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
 function getProgress(){return JSON.parse(localStorage.getItem('iqball2_prog')||'{"completed":[],"bestTimes":{},"streak":{"count":0,"best":0,"lastDate":""}}');}
 function saveProgress(p){localStorage.setItem('iqball2_prog',JSON.stringify(p));}
 function markCompleted(id){const p=getProgress();if(!p.completed.includes(id)){p.completed.push(id);saveProgress(p);}updateStreak();}
-function saveBestTime(id,secs){const p=getProgress();const prev=p.bestTimes[id];const ok=!prev||secs<prev;if(ok){p.bestTimes[id]=secs;saveProgress(p);}return ok;}
+function saveBestTime(id,secs){const p=getProgress();const prev=p.bestTimes[id];const ok=!prev||secs<prev;if(ok){p.bestTimes[id]=secs;saveProgress(p);sbSaveCompleted(id,secs);}return ok;}
 function updateStreak(){
   const today=new Date().toISOString().slice(0,10);
   const p=getProgress();if(p.streak.lastDate===today)return;
@@ -1096,11 +1174,11 @@ function refreshHomeStats(){
 // ═══════════════════════════════════════════════════
 function getScores(){return JSON.parse(localStorage.getItem('iqball_scores')||'[]');}
 function saveScore(secs){
-  let name=localStorage.getItem('iqball_name')||'';
-  if(!name)return;
-  const scores=getScores();
-  scores.push({name,chalId:currentChallenge.id,level:`${currentChallenge.difficulty} #${currentChallenge.num}`,time:secs,date:new Date().toISOString().slice(0,10)});
-  localStorage.setItem('iqball_scores',JSON.stringify(scores));
+  if(!currentChallenge)return;
+  const name=localStorage.getItem('iqball_name')||'';
+  const level=`${currentChallenge.difficulty} #${currentChallenge.num}`;
+  if(name){const scores=getScores();scores.push({name,chalId:currentChallenge.id,level,time:secs,date:new Date().toISOString().slice(0,10)});localStorage.setItem('iqball_scores',JSON.stringify(scores));}
+  sbSaveScore(currentChallenge.id,secs,level);
 }
 let lbChalId=1,lbDiff='Starter';
 const LB_DIFFS=[...DIFFS,'Pyramid'];
@@ -1138,11 +1216,21 @@ function renderLB(){
     tabs.appendChild(b);
   });
   document.getElementById('lbTitle').textContent=`🏆 ${lbDiff} — Leaderboard`;
-  // Scores
-  const scores=getScores().filter(s=>s.chalId===lbChalId).sort((a,b)=>a.time-b.time).slice(0,5);
-  const body=document.getElementById('lbBody');body.innerHTML='';
-  if(!scores.length){body.innerHTML='<tr><td colspan="4" style="color:var(--muted);padding:8px">Henüz kayıt yok.</td></tr>';return;}
-  scores.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${['🥇','🥈','🥉','4','5'][i]}</td><td>${s.name}</td><td>${fmt(s.time)}</td><td>${s.date}</td>`;body.appendChild(tr);});
+  const body=document.getElementById('lbBody');
+  // Local scores first (instant)
+  function renderRows(rows){
+    body.innerHTML='';
+    if(!rows.length){body.innerHTML='<tr><td colspan="4" style="color:var(--muted);padding:8px">Henüz kayıt yok.</td></tr>';return;}
+    rows.forEach((s,i)=>{const tr=document.createElement('tr');
+      const avHtml=s.avatar_url?`<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:50%;vertical-align:middle;margin-right:5px;">`:'';
+      tr.innerHTML=`<td>${['🥇','🥈','🥉','4','5'][i]}</td><td>${avHtml}${s.name||s.display_name||'—'}</td><td>${fmt(s.time||s.time_secs)}</td><td>${(s.date||s.scored_date||'').slice(0,10)}</td>`;
+      body.appendChild(tr);});
+  }
+  const local=getScores().filter(s=>s.chalId===lbChalId).sort((a,b)=>a.time-b.time).slice(0,5);
+  renderRows(local);
+  // Then try Supabase (overrides if available)
+  const curId=lbChalId;
+  sbGetLeaderboard(curId).then(rows=>{if(rows&&lbChalId===curId)renderRows(rows);});
 }
 
 // ═══════════════════════════════════════════════════
@@ -1386,14 +1474,8 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{
   localStorage.removeItem('iqball_profile');localStorage.removeItem('iqball_name');
   loadAvatarChip();showLoginModal();
 });
-document.getElementById('googleSignInBtn').addEventListener('click',()=>{
-  // Real Google Sign-In requires a client_id configured via Google Cloud Console.
-  // For now, guide user to set their name as a workaround.
-  document.getElementById('guestNameInput').focus();
-  document.getElementById('guestNameInput').style.borderColor='var(--accent)';
-  setTimeout(()=>document.getElementById('guestNameInput').style.borderColor='',1500);
-  alert('Google Sign-In için Google Cloud Console\'dan OAuth 2.0 Client ID alın ve GOOGLE_CLIENT_ID sabitine ekleyin.');
-});
+document.getElementById('googleSignInBtn').addEventListener('click', sbSignInGoogle);
+document.getElementById('logoutBtn').addEventListener('click', sbSignOut);
 document.getElementById('bDevMode').addEventListener('click',()=>{document.getElementById('devPanel').classList.add('show');buildDevGrid();});
 document.getElementById('bDevClose').addEventListener('click',()=>document.getElementById('devPanel').classList.remove('show'));
 document.getElementById('bDevBuild').addEventListener('click',buildDevGrid);
@@ -1898,6 +1980,7 @@ function initPyramid3d(challenge){
 // ═══════════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════════
+sbInit();
 loadAvatarChip();
 refreshHomeStats();
 </script>
