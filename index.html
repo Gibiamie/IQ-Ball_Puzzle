@@ -986,12 +986,20 @@ function buildBoard(){
     }
     el.appendChild(d);
   }
-  el.addEventListener('contextmenu',e=>{
+  // One delegated right-click listener, not a new listener on each rebuild.
+  el.oncontextmenu=e=>{
     e.preventDefault();
-    const t=e.target.closest('.cell');if(!t||t.classList.contains('blocked'))return;
+    if(solutionPreviewActive||paused)return;
+    const t=e.target.closest('.cell');
+    if(!t||t.classList.contains('blocked')||t.classList.contains('obstacle'))return;
     const pi=board[+t.dataset.r][+t.dataset.c];
-    if(pi!==null&&pi>=0&&!ps[pi].fixed){pushHistory();remPiece(pi);updRem();buildTray();render();}
-  });
+    if(pi!==null&&pi>=0&&!ps[pi].fixed){
+      pushHistory();
+      remPiece(pi); // restores piece to the right-hand tray
+      sel=null;hov=null;
+      updRem();buildTray();render();
+    }
+  };
 }
 
 // ═══════════════════════════════════════════════════
@@ -1060,14 +1068,26 @@ function buildTray(){
       pg.appendChild(b);
     }
     card.appendChild(pg);
-    card.addEventListener('click',()=>{if(!pointerMoved)selPiece(i);});
+    // A single tap selects immediately. Never rebuild/remove the touched card
+    // during pointerdown: this caused delayed/lost taps in Android WebViews.
+    function selectCard(){
+      if(ps[i].placed||ps[i].fixed||solutionPreviewActive||paused)return;
+      sel=i;
+      wrap.querySelectorAll('.pcard').forEach(c=>c.classList.remove('sel'));
+      card.classList.add('sel');
+      render();
+    }
     card.addEventListener('pointerdown',e=>{
-      if(ps[i].placed||ps[i].fixed)return;
-      e.preventDefault();
+      if(e.button!==0||e.target.closest('button')||ps[i].placed||ps[i].fixed)return;
       dragging=i;pointerMoved=false;
       dragStartX=e.clientX;dragStartY=e.clientY;
-      if(sel!==i){sel=i;buildTray();render();}
+      selectCard();
     });
+    card.addEventListener('click',e=>{if(!e.target.closest('button'))selectCard();});
+    card.tabIndex=0;
+    card.setAttribute('role','button');
+    card.setAttribute('aria-label','Select piece '+p.letter);
+    card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectCard();}});
     const info=document.createElement('div');info.className='pinfo';
     const nm=document.createElement('div');nm.className='pname';nm.textContent=p.letter;
     const btns=document.createElement('div');btns.className='pbtns';
@@ -1980,11 +2000,19 @@ function buildTrayPyr3d(){
       const bf=document.createElement('button');bf.textContent='🪞';
       bf.addEventListener('click',e=>{e.stopPropagation();if(!piece.placed){piece.flip=!piece.flip;buildTrayPyr3d();renderPyramid3d();}});
       btns.append(br,bf);info.append(nm,btns);card.appendChild(info);
-      card.addEventListener('click',()=>{
-        if(piece.placed||piece.fixed)return;
-        pyr3d.selLtr=(pyr3d.selLtr===piece.letter)?null:piece.letter;
-        buildTrayPyr3d();renderPyramid3d();
-      });
+      function choose3d(){
+        if(piece.placed||piece.fixed||solutionPreviewActive||paused)return;
+        pyr3d.selLtr=piece.letter;
+        wrap.querySelectorAll('.pcard').forEach(c=>c.classList.remove('sel'));
+        card.classList.add('sel');
+        renderPyramid3d();
+      }
+      card.addEventListener('pointerdown',e=>{if(e.button===0&&!e.target.closest('button'))choose3d();});
+      card.addEventListener('click',e=>{if(!e.target.closest('button'))choose3d();});
+      card.tabIndex=0;
+      card.setAttribute('role','button');
+      card.setAttribute('aria-label','Select 3D piece '+piece.letter);
+      card.addEventListener('keydown',e=>{if(e.target===card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();choose3d();}});
       wrap.appendChild(card);
     });
   });
