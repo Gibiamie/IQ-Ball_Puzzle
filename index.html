@@ -488,31 +488,31 @@ const CHALLENGES=[
    fixed:['A','B','H'],shape:'obstacle',
    hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
 
-  // ── PYRAMID ── 5-row (15 cells), 5 triomino pieces each
+  // ── PYRAMID ── 5×5 flat board
   {id:21,difficulty:'Starter',num:'🔺1',rows:5,cols:5,
-   grid:["A","AB","ABC","DBCE","DDCEE"],
-   fixed:['A','B','C'],shape:'pyramid',
-   hints:["Three vertical columns (A, B, C) are pre-placed","D and E are both L-shaped — they fit in the two lower corners","D goes bottom-left, E goes bottom-right"]},
+   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
+   fixed:['C','E','F','G'],shape:'rect',
+   hints:["C, E, F and G are pre-placed","A is a small top-left L-shape","B is a 2×2 square; D is the center L-piece"]},
 
   {id:22,difficulty:'Starter',num:'🔺2',rows:5,cols:5,
-   grid:["A","AB","ABB","CCCD","EEEDD"],
-   fixed:['A','B','C'],shape:'pyramid',
-   hints:["Left column A, upper-right L piece B, and middle row C are fixed","E is a horizontal row — it fits along the bottom-left","D is an L-shape in the bottom-right corner"]},
+   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
+   fixed:['A','B','C'],shape:'rect',
+   hints:["A, B and C are pre-placed along the top","D is an L-shape spanning the middle row","F and G fill the bottom corners; E runs down the right"]},
 
   {id:23,difficulty:'Junior',num:'🔺3',rows:5,cols:5,
-   grid:["A","AB","ABB","CDDE","CCDEE"],
-   fixed:['A','B'],shape:'pyramid',
-   hints:["A (left column) and B (upper-right L) are fixed","Three L-shapes remain to fill the lower triangle","C goes bottom-left, D bridges the middle, E bottom-right"]},
+   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
+   fixed:['A','B'],shape:'rect',
+   hints:["A and B are pre-placed in the top portion","C runs down the entire right column","D spans the middle row; F and G fill the bottom corners"]},
 
   {id:24,difficulty:'Junior',num:'🔺4',rows:5,cols:5,
-   grid:["A","AA","BCD","BCDE","BCDEE"],
-   fixed:['A','B'],shape:'pyramid',
-   hints:["A (top L-shape) and B (left column rows 2–4) are fixed","C and D are vertical columns — fill columns 1 and 2","E is an L-shape fitting in the bottom-right corner"]},
+   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
+   fixed:['D','F'],shape:'rect',
+   hints:["D and F are pre-placed in the center-left","A and B fill the top; C runs down the right","E and G complete the bottom-right area"]},
 
   {id:25,difficulty:'Expert',num:'🔺5',rows:5,cols:5,
-   grid:["A","AA","BCC","BCDE","BDDEE"],
-   fixed:['A'],shape:'pyramid',
-   hints:["Only A (the top L-shape) is fixed","B fills the left column in rows 2–4","C, D, E are L-shapes filling the lower-right area"]},
+   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
+   fixed:['A'],shape:'rect',
+   hints:["Only A is pre-placed in the top-left corner","B is a 2×2 square — place it right next to A","D spans three cells in the middle row"]},
 
   // ── STARTER round 2 ──
   {id:26,difficulty:'Starter',num:6,rows:3,cols:4,
@@ -596,29 +596,29 @@ const CHALLENGES=[
 
   // ── PYRAMID round 2 ──
   {id:41,difficulty:'Expert',num:'🔺6',rows:5,cols:5,
-   grid:["A","AA","BBB","CCCD","EEEDD"],
-   fixed:['A'],shape:'pyramid',
-   hints:["Only A (top-left L-piece) is fixed","B, C, E are all horizontal rows of 3 cells","D is an L-shape in the bottom-right corner"]},
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['A','C'],shape:'rect',
+   hints:["A is top-left, C is top-right — both fixed","B connects top-center; D is the largest piece","E, F go through the center; G and H fill the bottom corners"]},
 
-  {id:42,difficulty:'Master',num:'🔺7',rows:5,cols:5,
-   grid:["A","AA","BBB","CDDE","CCDEE"],
-   fixed:[],shape:'pyramid',
-   hints:["No pieces are pre-placed — build the entire pyramid","A is the top L-piece; B is a horizontal row in row 2","C, D, E are L-shapes filling the lower triangle"]},
+  {id:42,difficulty:'Expert',num:'🔺7',rows:5,cols:5,
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['A'],shape:'rect',
+   hints:["Only A is fixed in the top-left corner","B is a small top-center L-shape","D is the key piece — it spans 4 cells in the left-center area"]},
 
   {id:43,difficulty:'Master',num:'🔺8',rows:5,cols:5,
-   grid:["A","AA","BCC","BBCD","EEEDD"],
-   fixed:[],shape:'pyramid',
-   hints:["No pieces pre-placed — place all 5 pieces","A is the top-left L; E is a horizontal row on the bottom-left","B and C are interlocking L-shapes; D is the bottom-right corner"]},
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['D'],shape:'rect',
+   hints:["Only D is fixed — it spans the left-center area","A starts top-left, B right next to it","F runs down the center column; G and H are bottom corner L-shapes"]},
 
   {id:44,difficulty:'Wizard',num:'🔺9',rows:5,cols:5,
-   grid:["A","AA","BBC","BDCE","DDCEE"],
-   fixed:[],shape:'pyramid',
-   hints:["No pieces pre-placed — expert arrangement","A is the top-left L; C is a vertical column down the center","B and D are interlocking L-shapes on the left side"]},
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:['H'],shape:'rect',
+   hints:["Only H is fixed in the bottom-right corner","Start by placing D (the largest piece) in the center-left","Work systematically from one corner to the other"]},
 
   {id:45,difficulty:'Wizard',num:'🔺10',rows:5,cols:5,
-   grid:["A","AA","BBC","DBCE","DDCEE"],
-   fixed:[],shape:'pyramid',
-   hints:["No pieces pre-placed — the ultimate pyramid challenge","A is the top-left L; C is the center vertical column","B sits in the middle-left area; D and E are corner L-shapes"]},
+   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
+   fixed:[],shape:'rect',
+   hints:["No pieces are pre-placed — build the entire board","This is the ultimate pyramid challenge","Try placing D first — it anchors the left side"]},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -639,10 +639,6 @@ function parseLevel(raw){
     const mr=Math.min(...abs.map(([r])=>r)),mc=Math.min(...abs.map(([,c])=>c));
     return{letter:ch,color:LC[ch]||'R',cells:abs.map(([r,c])=>[r-mr,c-mc]),solveR:mr,solveC:mc};
   });
-  // For pyramid, mark cells where c > r as blocked (outside the triangle)
-  if(shape==='pyramid'){
-    for(let r=0;r<rows;r++)for(let c=r+1;c<cols;c++)blocked.add(`${r},${c}`);
-  }
   return{rows,cols,pieces,blocked,obstacles,shape};
 }
 
@@ -774,43 +770,8 @@ function buildBoard(){
   const sz=Math.min(54,Math.floor(Math.min(aw/cols,ah/rows))-5);
   document.documentElement.style.setProperty('--cs',sz+'px');
   // Reset any pyramid flex styles from previous board
-  el.style.display='';el.style.flexDirection='';el.style.alignItems='';
   el.style.gridTemplateColumns=`repeat(${cols},var(--cs))`;
   el.innerHTML='';
-
-  // ── PYRAMID LAYOUT ──
-  if(lv.shape==='pyramid'){
-    el.style.gridTemplateColumns='unset';
-    el.style.display='flex';
-    el.style.flexDirection='column';
-    el.style.alignItems='center';
-    el.style.gap='5px';
-    const mkCell=(r,c)=>{
-      const d=document.createElement('div');
-      d.className='cell';d.dataset.r=r;d.dataset.c=c;
-      d.addEventListener('mouseenter',()=>{hov=[r,c];render();});
-      d.addEventListener('mouseleave',()=>{hov=null;render();});
-      d.addEventListener('click',()=>onCell(r,c));
-      d.addEventListener('dblclick',()=>{
-        const pi=board[r][c];
-        if(pi!==null&&pi>=0&&!ps[pi].fixed){pushHistory();remPiece(pi);updRem();buildTray();render();}
-      });
-      return d;
-    };
-    for(let r=0;r<rows;r++){
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;gap:5px;';
-      for(let c=0;c<=r;c++)row.appendChild(mkCell(r,c));
-      el.appendChild(row);
-    }
-    el.addEventListener('contextmenu',e=>{
-      e.preventDefault();
-      const t=e.target.closest('.cell');if(!t)return;
-      const pi=board[+t.dataset.r][+t.dataset.c];
-      if(pi!==null&&pi>=0&&!ps[pi].fixed){pushHistory();remPiece(pi);updRem();buildTray();render();}
-    });
-    return;
-  }
 
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const d=document.createElement('div');
