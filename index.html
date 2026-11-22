@@ -1261,6 +1261,13 @@ window.addEventListener('resize',()=>{
 // ═══════════════════════════════════════════════════
 const P3TW=30,P3TH=15,P3SH=15;
 const P3OFF=[0,0.5,1,1.5,2];
+const P3VIEWS=['N','E','S','W'];
+
+// Rotate logical (c,r) in NxN layer for view rotation
+function p3RotC(c,r,N,rot){
+  switch(rot&3){case 0:return[c,r];case 1:return[r,N-1-c];case 2:return[N-1-c,N-1-r];case 3:return[N-1-r,c];}
+}
+function p3RotCInv(vc,vr,N,rot){return p3RotC(vc,vr,N,(4-rot)&3);}
 
 function p3Iso(col,row,lyr){
   const off=P3OFF[lyr]||0;
@@ -1341,7 +1348,7 @@ function p3SmartAnchor(piece,lyrData,tr,tc){
 }
 
 function parsePyramid3d(ch){
-  pyr3d={challenge:ch,layers:[],selLtr:null,hov:null,history:[],canvas:null,ctx:null,viewRot:0};
+  pyr3d={challenge:ch,layers:[],selLtr:null,hov:null,history:[],canvas:null,ctx:null,viewRot:0,orbitBtn:null};
   ch.layers.forEach((def,lyrIdx)=>{
     const{rows,cols,grid,fixed:fixedLetters=[]}=def;
     const map={};
@@ -1368,8 +1375,27 @@ function parsePyramid3d(ch){
 
 function buildBoardPyramid3d(){
   const el=document.getElementById('board');
-  el.style.cssText='display:flex;align-items:center;justify-content:center;padding:0;background:transparent;border:none;box-shadow:none;border-radius:0;gap:0;';
+  el.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;background:transparent;border:none;box-shadow:none;border-radius:0;gap:0;';
   el.innerHTML='';
+  // Orbit UI bar
+  const orb=document.createElement('div');
+  orb.style.cssText='display:flex;gap:4px;align-items:center;margin-bottom:5px;user-select:none;';
+  const orbitLbl=document.createElement('span');
+  orbitLbl.style.cssText='font-size:.6rem;color:#5577aa;letter-spacing:1px;min-width:18px;text-align:center;';
+  orbitLbl.textContent=P3VIEWS[pyr3d.viewRot];
+  const mkOrbBtn=(sym,delta)=>{
+    const b=document.createElement('button');
+    b.textContent=sym;
+    b.style.cssText='padding:2px 10px;background:#0d1424;border:1px solid #223355;color:#5588bb;border-radius:5px;cursor:pointer;font-size:13px;line-height:1.4;';
+    b.addEventListener('click',()=>{
+      pyr3d.viewRot=(pyr3d.viewRot+delta+4)&3;
+      orbitLbl.textContent=P3VIEWS[pyr3d.viewRot];
+      buildTrayPyr3d();renderPyramid3d();
+    });
+    return b;
+  };
+  orb.append(mkOrbBtn('◀',3),orbitLbl,mkOrbBtn('▶',1));
+  el.appendChild(orb);
   // Compute available area (much larger limits)
   const panel=document.getElementById('gPanel');
   const hdr=document.getElementById('gHdr');
@@ -1426,16 +1452,19 @@ function p3RotC(c,r,N,rot){
 function p3RotCInv(vc,vr,N,rot){return p3RotC(vc,vr,N,(4-rot)&3);}
 
 function p3HitTest(mx,my){
+  const rot=pyr3d.viewRot||0;
   const cells=[];
   pyr3d.layers.forEach((lyrData,lyrIdx)=>{
     const off=P3OFF[lyrIdx]||0;
+    const N=lyrData.rows;
     for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++){
-      cells.push({lyr:lyrIdx,r,c,key:(c+r+2*off)*10+lyrIdx});
+      const[vc,vr]=p3RotC(c,r,N,rot);
+      cells.push({lyr:lyrIdx,r,c,vc,vr,key:(vc+vr+2*off)*10+lyrIdx});
     }
   });
   cells.sort((a,b)=>b.key-a.key);
   for(const cell of cells){
-    const{x,y}=p3Iso(cell.c,cell.r,cell.lyr);
+    const{x,y}=p3Iso(cell.vc,cell.vr,cell.lyr);
     if(Math.abs((mx-x)/P3TW)+Math.abs((my-(y+P3TH))/P3TH)<=1)return cell;
   }
   return null;
@@ -1446,11 +1475,14 @@ function renderPyramid3d(){
   const ctx=pyr3d.ctx,cv=pyr3d.canvas;
   ctx.clearRect(0,0,cv.width,cv.height);
   // build all cells (interactive + decorative)
+  const rot=pyr3d.viewRot||0;
   const cells=[];
   pyr3d.layers.forEach((lyrData,lyrIdx)=>{
     const off=P3OFF[lyrIdx]||0;
+    const N=lyrData.rows;
     for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++){
-      cells.push({lyr:lyrIdx,r,c,vc:c,vr:r,interactive:true,key:(c+r+2*off)*10+lyrIdx});
+      const[vc,vr]=p3RotC(c,r,N,rot);
+      cells.push({lyr:lyrIdx,r,c,vc,vr,interactive:true,key:(vc+vr+2*off)*10+lyrIdx});
     }
   });
   // decorative top layers: 2×2 (index 2) and 1×1 (index 3)
@@ -1459,7 +1491,8 @@ function renderPyramid3d(){
     const lyrIdx=pyr3d.layers.length+di;
     const off=P3OFF[lyrIdx]||0;
     for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){
-      cells.push({lyr:lyrIdx,r,c,vc:c,vr:r,interactive:false,key:(c+r+2*off)*10+lyrIdx});
+      const[vc,vr]=p3RotC(c,r,sz,rot);
+      cells.push({lyr:lyrIdx,r,c,vc,vr,interactive:false,key:(vc+vr+2*off)*10+lyrIdx});
     }
   });
   cells.sort((a,b)=>a.key-b.key);
@@ -1499,7 +1532,8 @@ function renderPyramid3d(){
   ctx.font='11px Segoe UI,system-ui';ctx.textAlign='left';
   pyr3d.layers.forEach((lyrData,lyrIdx)=>{
     ctx.fillStyle=lyrIdx===0?'rgba(249,202,36,.55)':'rgba(100,180,255,.55)';
-    const{x,y}=p3Iso(0,lyrData.rows-1,lyrIdx);
+    const[vc,vr]=p3RotC(0,lyrData.rows-1,lyrData.rows,rot);
+    const{x,y}=p3Iso(vc,vr,lyrIdx);
     ctx.fillText(`L${lyrIdx} (${lyrData.rows}×${lyrData.cols})`,x-P3TW-2,y+2*P3TH+9);
   });
 }
@@ -1556,7 +1590,17 @@ function checkWinPyr3d(){
   markCompleted(pyr3d.challenge.id);
   const isRec=saveBestTime(pyr3d.challenge.id,elapsed);
   const snap=elapsed;
-  // Delay so user can admire the completed pyramid before the modal appears
+  saveScore(snap);
+  // Show a subtle "solved" banner on the canvas, then wait for user to press Next
+  if(pyr3d.canvas){
+    const ctx=pyr3d.ctx,cv=pyr3d.canvas;
+    ctx.save();
+    ctx.fillStyle='rgba(10,20,40,0.72)';ctx.fillRect(0,cv.height-38,cv.width,38);
+    ctx.font='bold 15px Segoe UI,system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#f9ca24';ctx.fillText('🎉 Tamamlandı! — Devam için ▶ Next',cv.width/2,cv.height-19);
+    ctx.restore();
+  }
+  // Show win modal after a short delay so user sees the banner first
   setTimeout(()=>{
     document.getElementById('winTitle').textContent='🎉 Puzzle Solved!';
     document.getElementById('winMsg').textContent=`${pyr3d.challenge.difficulty} · Challenge ${pyr3d.challenge.num}`;
@@ -1565,8 +1609,7 @@ function checkWinPyr3d(){
     const next=getNextChallenge();
     document.getElementById('bWinNext').style.display=next?'':'none';
     document.getElementById('winModal').classList.add('show');
-    saveScore(snap);
-  },1800);
+  },3500);
 }
 
 function buildTrayPyr3d(){
@@ -1581,20 +1624,23 @@ function buildTrayPyr3d(){
       const color=piece.color;
       const card=document.createElement('div');
       card.className='pcard'+(piece.placed?' placed':pyr3d.selLtr===piece.letter?' sel':'');
-      // Mini isometric canvas preview — balls (same style as board)
+      // Mini isometric canvas preview — balls rotated with board viewRot
       const mTW=13,mTH=6,mOX=36,mOY=16,mR=10;
       const mCV=document.createElement('canvas');
       mCV.width=72;mCV.height=52;mCV.style.cssText='flex-shrink:0;border-radius:3px;';
       const mCtx=mCV.getContext('2d');
-      const minR=Math.min(...cs.map(([r])=>r)),minC=Math.min(...cs.map(([,c])=>c));
-      const sorted=[...cs].sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
-      sorted.forEach(([r,c])=>{
-        const vc=c-minC,vr=r-minR;
-        const cx=mOX+(vc-vr)*mTW,cy=mOY+(vc+vr)*mTH+mTH;
-        // shadow
+      // Apply board viewRot to piece cells so tray matches board orientation
+      const vrot=pyr3d.viewRot||0;
+      const mr2=Math.max(...cs.map(([r])=>r)),mc2=Math.max(...cs.map(([,c])=>c));
+      const N2=Math.max(mr2,mc2)+1;
+      const vcells=cs.map(([r,c])=>p3RotC(c,r,N2,vrot));
+      const minVC=Math.min(...vcells.map(([vc])=>vc)),minVR=Math.min(...vcells.map(([,vr])=>vr));
+      const sorted=[...vcells].sort((a,b)=>(a[0]+a[1])-(b[0]+b[1]));
+      sorted.forEach(([vc,vr])=>{
+        const dcol=vc-minVC,drow=vr-minVR;
+        const cx=mOX+(dcol-drow)*mTW,cy=mOY+(dcol+drow)*mTH+mTH;
         mCtx.beginPath();mCtx.ellipse(cx,cy+mR*0.52,mR*0.82,mR*0.3,0,0,2*Math.PI);
         mCtx.fillStyle='rgba(0,0,0,0.3)';mCtx.fill();
-        // ball gradient
         const bc=piece.placed?'#333':color;
         const g=mCtx.createRadialGradient(cx-mR*0.32,cy-mR*0.3,mR*0.04,cx,cy,mR);
         g.addColorStop(0,'rgba(255,255,255,0.88)');
