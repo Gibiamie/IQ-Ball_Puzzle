@@ -146,6 +146,16 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 .mclose{margin-top:11px;width:100%;padding:8px;border:1px solid var(--border);border-radius:18px;background:transparent;color:var(--muted);cursor:pointer;font-size:.74rem}
 .mclose:hover{background:#21262d}
 
+/* Non-blocking solution preview: the solution must remain fully visible. */
+#solutionBar{display:none;position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:250;width:min(94vw,500px);padding:12px 14px;border:1px solid #596477;border-radius:15px;background:#192332;color:#fff;box-shadow:0 6px 22px rgba(0,0,0,.35);align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between}
+#solutionBar.show{display:flex}
+#solutionBar .sp-title{font-size:.9rem;font-weight:800;color:#f9ca24}
+#solutionBar .sp-sub{font-size:.72rem;color:#d1d9e4;margin-top:3px;line-height:1.3}
+#solutionBar .sp-actions{display:flex;gap:6px;flex-wrap:wrap}
+#solutionBar button{border:1px solid #46536a;border-radius:18px;background:#29364a;color:#fff;padding:8px 12px;font-size:.75rem;font-weight:700;cursor:pointer}
+#solutionBar #bSolNext{background:#1eb89a;border-color:#1eb89a;color:#071b18}
+#solutionBar button:disabled{opacity:.4;cursor:default}
+@media(max-width:480px){#solutionBar{gap:7px;padding:10px 12px}#solutionBar .sp-actions{width:100%;justify-content:flex-end}}
 /* Win */
 #winModal .mbox{text-align:center}
 #winTitle{font-size:1.9rem;background:linear-gradient(135deg,#f9ca24,#e84393);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pop .7s ease-in-out infinite alternate}
@@ -301,6 +311,16 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
       <button id="bWinRetry">↺ Retry</button>
       <button id="bWinNext">Next ▶</button>
     </div>
+  </div>
+</div>
+
+<!-- SOLUTION PREVIEW: no backdrop, so all pieces remain visible -->
+<div id="solutionBar" role="status" aria-live="polite">
+  <div class="sp-label"><div class="sp-title">🧩 Solution Preview</div><div class="sp-sub" id="solutionStatus">Watch the solution. No score recorded.</div></div>
+  <div class="sp-actions">
+    <button id="bSolMenu">☰ Menu</button>
+    <button id="bSolRetry">↺ Retry</button>
+    <button id="bSolNext">Next ▶</button>
   </div>
 </div>
 
@@ -814,7 +834,20 @@ let dragging=null,ghost=null,pointerMoved=false,dragStartX=0,dragStartY=0;
 // ═══════════════════════════════════════════════════
 // SCREEN NAVIGATION
 // ═══════════════════════════════════════════════════
+let solutionRun=0,solutionPreviewActive=false;
+function cancelSolutionPreview(){
+  solutionRun++;
+  solutionPreviewActive=false;
+  document.getElementById('solutionBar').classList.remove('show');
+}
+function showSolutionBar(message,next){
+  document.getElementById('winModal').classList.remove('show');
+  document.getElementById('solutionStatus').textContent=message;
+  document.getElementById('bSolNext').disabled=!next;
+  document.getElementById('solutionBar').classList.add('show');
+}
 function showScreen(id){
+  if(id!=='s-game')cancelSolutionPreview();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
@@ -887,6 +920,7 @@ function renderChallengeScreen(diff){
 // INIT LEVEL
 // ═══════════════════════════════════════════════════
 function startChallenge(challenge){
+  cancelSolutionPreview();
   if(challenge.shape==='pyramid3d'){initPyramid3d(challenge);return;}
   currentChallenge=challenge;
   lv=parseLevel(challenge);
@@ -1069,6 +1103,7 @@ function smartAnchor(i,tr,tc){
   return null;
 }
 function onCell(r,c){
+  if(solutionPreviewActive)return;
   if(paused)return;
   const pi=board[r][c];
   // Click on a placed non-fixed piece = pick it up and auto-select
@@ -1119,16 +1154,20 @@ function getNextChallenge(){
 // ═══════════════════════════════════════════════════
 function doSolve(){
   if(pyr3d){doSolvePyr3d();return;}
-  pushHistory();
+  const run=++solutionRun;
+  solutionPreviewActive=true;
+  clearInterval(tmID);
+  showSolutionBar('Preparing solution… No score or progress will be recorded.',getNextChallenge());
   board=Array.from({length:rows},()=>Array(cols).fill(null));
   lv.blocked.forEach(k=>{const[r,c]=k.split(',').map(Number);board[r][c]=-1;});
   lv.obstacles.forEach(k=>{const[r,c]=k.split(',').map(Number);board[r][c]=-2;});
   ps=lv.pieces.map((_,i)=>({rot:0,flip:false,placed:false,fixed:ps[i]?.fixed||false}));
-  sel=null;
+  sel=null;hov=null;
   lv.pieces.forEach((p,i)=>setTimeout(()=>{
+    if(run!==solutionRun)return;
     for(const[r,c]of cellsAt(i,p.solveR,p.solveC))board[r][c]=i;
     ps[i].placed=true;updRem();buildTray();render();
-    if(i===lv.pieces.length-1)checkWin();
+    if(i===lv.pieces.length-1)showSolutionBar('Solution complete. Review the board, then tap NEXT.',getNextChallenge());
   },i*260));
 }
 
@@ -1450,6 +1489,12 @@ document.getElementById('gBtnPause').addEventListener('click',()=>paused?resumeG
 document.getElementById('gBtnReset').addEventListener('click',()=>startChallenge(currentChallenge));
 document.getElementById('gBtnUndo').addEventListener('click',undo);
 document.getElementById('bResume').addEventListener('click',resumeGame);
+document.getElementById('bSolMenu').addEventListener('click',()=>goHome());
+document.getElementById('bSolRetry').addEventListener('click',()=>startChallenge(pyr3d?pyr3d.challenge:currentChallenge));
+document.getElementById('bSolNext').addEventListener('click',()=>{
+  const next=pyr3d?getNextPyr3dChallenge():getNextChallenge();
+  if(next)startChallenge(next);
+});
 document.getElementById('bWinMenu').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');goHome();});
 document.getElementById('bWinRetry').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');startChallenge(pyr3d?pyr3d.challenge:currentChallenge);});
 document.getElementById('bWinNext').addEventListener('click',()=>{
@@ -1946,7 +1991,10 @@ function buildTrayPyr3d(){
 }
 
 function doSolvePyr3d(){
-  p3PushHistory();
+  const run=++solutionRun;
+  solutionPreviewActive=true;
+  clearInterval(tmID);
+  showSolutionBar('Preparing 3D solution… No score or progress recorded.',getNextPyr3dChallenge());
   pyr3d.layers.forEach(lyrData=>{
     lyrData.board=Array.from({length:lyrData.rows},()=>Array(lyrData.cols).fill(null));
     lyrData.pieces.forEach(p=>{
@@ -1957,10 +2005,12 @@ function doSolvePyr3d(){
   pyr3d.selLtr=null;
   const all=[];
   pyr3d.layers.forEach(lyrData=>lyrData.pieces.forEach(p=>{if(!p.fixed)all.push({piece:p,lyrData});}));
+  if(all.length===0){renderPyramid3d();showSolutionBar('Solution complete. Review the board, then tap NEXT.',getNextPyr3dChallenge());return;}
   all.forEach(({piece,lyrData},i)=>setTimeout(()=>{
+    if(run!==solutionRun)return;
     p3CellsAt(piece,piece.solveR,piece.solveC).forEach(([r,c])=>{lyrData.board[r][c]=piece.letter;});
     piece.placed=true;updRem();buildTrayPyr3d();renderPyramid3d();
-    if(i===all.length-1)checkWinPyr3d();
+    if(i===all.length-1)showSolutionBar('Solution complete. Review the board, then tap NEXT.',getNextPyr3dChallenge());
   },i*260));
 }
 
