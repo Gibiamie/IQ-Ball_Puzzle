@@ -120,6 +120,9 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 .pcard:hover{border-color:#8b949e;background:var(--panel2)}
 .pcard.sel{border-color:#fff;background:#21262d}
 .pcard.placed{opacity:.18;pointer-events:none}
+.pyr3d-lyr-hdr{font-size:.52rem;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;padding:5px 2px 2px;border-bottom:1px solid var(--border);margin-bottom:2px;margin-top:4px}
+.pyr3d-lyr-hdr:first-child{margin-top:0}
+#pyr3dCanvas{background:#060a12;border:2px solid #1e2a3d;border-radius:12px;display:block}
 .pgrid{display:grid;gap:2px;flex-shrink:0}
 .pdot{width:17px;height:17px;border-radius:50%}
 .pinfo{display:flex;flex-direction:column;gap:3px;flex:1;align-items:flex-end}
@@ -488,31 +491,41 @@ const CHALLENGES=[
    fixed:['A','B','H'],shape:'obstacle',
    hints:["A, B and H are all fixed — 3 starting pieces","Two obstacles block the center of the board","C and E fill the right side","G must bridge across the obstacle gap"]},
 
-  // ── PYRAMID ── 5×5 flat board
-  {id:21,difficulty:'Starter',num:'🔺1',rows:5,cols:5,
-   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
-   fixed:['C','E','F','G'],shape:'rect',
-   hints:["C, E, F and G are pre-placed","A is a small top-left L-shape","B is a 2×2 square; D is the center L-piece"]},
+  // ── PYRAMID 3D ── isometric 2-layer board
+  {id:21,difficulty:'Starter',num:'🔺1',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['C','E','F','G']},
+     {rows:3,cols:3,grid:["HHI","HJI","JJI"],fixed:['H','J']}
+   ],
+   hints:["C, E, F, G pre-placed on base layer; H and J on top","Place A, B, D on the 5×5 base","Place I on the 3×3 upper layer"]},
 
-  {id:22,difficulty:'Starter',num:'🔺2',rows:5,cols:5,
-   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
-   fixed:['A','B','C'],shape:'rect',
-   hints:["A, B and C are pre-placed along the top","D is an L-shape spanning the middle row","F and G fill the bottom corners; E runs down the right"]},
+  {id:22,difficulty:'Starter',num:'🔺2',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['A','B','D']},
+     {rows:3,cols:3,grid:["HHI","HJI","JJI"],fixed:['H','I']}
+   ],
+   hints:["A, B, D fixed on base; H, I fixed on top layer","Place C, E, F, G on the 5×5 base","Place J on the 3×3 upper layer"]},
 
-  {id:23,difficulty:'Junior',num:'🔺3',rows:5,cols:5,
-   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
-   fixed:['A','B'],shape:'rect',
-   hints:["A and B are pre-placed in the top portion","C runs down the entire right column","D spans the middle row; F and G fill the bottom corners"]},
+  {id:23,difficulty:'Junior',num:'🔺3',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['A','B']},
+     {rows:3,cols:3,grid:["HHI","HJI","JJI"],fixed:['H']}
+   ],
+   hints:["A, B fixed on base; H anchors top-left of layer 1","Place C, D, E, F, G on base","Place I, J on the upper 3×3 layer"]},
 
-  {id:24,difficulty:'Junior',num:'🔺4',rows:5,cols:5,
-   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
-   fixed:['D','F'],shape:'rect',
-   hints:["D and F are pre-placed in the center-left","A and B fill the top; C runs down the right","E and G complete the bottom-right area"]},
+  {id:24,difficulty:'Junior',num:'🔺4',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['D','F']},
+     {rows:3,cols:3,grid:["HHI","HJI","JJI"],fixed:['I']}
+   ],
+   hints:["D (center-L) and F (bottom-left) are fixed on base","I is the right column of the top layer","Place A, B, C, E, G on base; H, J on top"]},
 
-  {id:25,difficulty:'Expert',num:'🔺5',rows:5,cols:5,
-   grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],
-   fixed:['A'],shape:'rect',
-   hints:["Only A is pre-placed in the top-left corner","B is a 2×2 square — place it right next to A","D spans three cells in the middle row"]},
+  {id:25,difficulty:'Expert',num:'🔺5',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['A']},
+     {rows:3,cols:3,grid:["HHI","HJI","JJI"],fixed:[]}
+   ],
+   hints:["Only A is fixed in the top-left corner of base","Layer 1 (3×3) is completely empty","Place B–G on base and all of H, I, J on top"]},
 
   // ── STARTER round 2 ──
   {id:26,difficulty:'Starter',num:6,rows:3,cols:4,
@@ -594,31 +607,41 @@ const CHALLENGES=[
    fixed:['A','I'],shape:'rect',
    hints:["A top-left and I bottom-right area are fixed","9 free pieces on the 5×6 board","H forms a vertical column on the far right"]},
 
-  // ── PYRAMID round 2 ──
-  {id:41,difficulty:'Expert',num:'🔺6',rows:5,cols:5,
-   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
-   fixed:['A','C'],shape:'rect',
-   hints:["A is top-left, C is top-right — both fixed","B connects top-center; D is the largest piece","E, F go through the center; G and H fill the bottom corners"]},
+  // ── PYRAMID 3D round 2 ── (layer 1 uses alternate tiling HHJ/HIJ/IIJ)
+  {id:41,difficulty:'Expert',num:'🔺6',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['C','E']},
+     {rows:3,cols:3,grid:["HHJ","HIJ","IIJ"],fixed:['H']}
+   ],
+   hints:["C (right edge) and E (lower-right) fixed on base","H anchors top-left of the upper layer","Place A, B, D, F, G on base; I, J on top"]},
 
-  {id:42,difficulty:'Expert',num:'🔺7',rows:5,cols:5,
-   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
-   fixed:['A'],shape:'rect',
-   hints:["Only A is fixed in the top-left corner","B is a small top-center L-shape","D is the key piece — it spans 4 cells in the left-center area"]},
+  {id:42,difficulty:'Expert',num:'🔺7',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['B']},
+     {rows:3,cols:3,grid:["HHJ","HIJ","IIJ"],fixed:[]}
+   ],
+   hints:["Only B (the 2×2 square) is fixed on the base","Layer 1 is fully open — place all 3 pieces","Place A, C, D, E, F, G on base; H, I, J on top"]},
 
-  {id:43,difficulty:'Master',num:'🔺8',rows:5,cols:5,
-   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
-   fixed:['D'],shape:'rect',
-   hints:["Only D is fixed — it spans the left-center area","A starts top-left, B right next to it","F runs down the center column; G and H are bottom corner L-shapes"]},
+  {id:43,difficulty:'Master',num:'🔺8',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:['G']},
+     {rows:3,cols:3,grid:["HHJ","HIJ","IIJ"],fixed:[]}
+   ],
+   hints:["Only G (bottom-center L) is fixed on base","Layer 1 is completely open","Place A, B, C, D, E, F on base; H, I, J on top"]},
 
-  {id:44,difficulty:'Wizard',num:'🔺9',rows:5,cols:5,
-   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
-   fixed:['H'],shape:'rect',
-   hints:["Only H is fixed in the bottom-right corner","Start by placing D (the largest piece) in the center-left","Work systematically from one corner to the other"]},
+  {id:44,difficulty:'Wizard',num:'🔺9',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:[]},
+     {rows:3,cols:3,grid:["HHJ","HIJ","IIJ"],fixed:['J']}
+   ],
+   hints:["Base layer is completely empty!","J (right column of layer 1) is pre-placed","Fill all 7 base pieces and H, I on top"]},
 
-  {id:45,difficulty:'Wizard',num:'🔺10',rows:5,cols:5,
-   grid:["AABBC","ADBEC","DDFEC","GDFEH","GGFHH"],
-   fixed:[],shape:'rect',
-   hints:["No pieces are pre-placed — build the entire board","This is the ultimate pyramid challenge","Try placing D first — it anchors the left side"]},
+  {id:45,difficulty:'Wizard',num:'🔺10',rows:5,cols:5,shape:'pyramid3d',
+   layers:[
+     {rows:5,cols:5,grid:["AABBC","ADBBC","DDDEC","FGGEC","FFGEE"],fixed:[]},
+     {rows:3,cols:3,grid:["HHJ","HIJ","IIJ"],fixed:[]}
+   ],
+   hints:["No pieces pre-placed — the ultimate 3D pyramid!","10 pieces total: 7 on base layer, 3 on upper layer","Try placing D first on the base, then work outward"]},
 ];
 
 // ═══════════════════════════════════════════════════
@@ -648,6 +671,7 @@ function parseLevel(raw){
 let currentDiff='Starter',currentChallenge=null;
 let lv,rows,cols,board,ps;
 let sel=null,hov=null,history=[];
+let pyr3d=null;
 let tmID,t0,elapsed=0,paused=false,hintLevel=0;
 let dragging=null,ghost=null,pointerMoved=false,dragStartX=0,dragStartY=0;
 
@@ -716,7 +740,8 @@ function renderChallengeScreen(diff){
     const locked=i>0&&!prog.completed.includes(chals[i-1].id)&&!completed;
     const card=document.createElement('div');
     card.className='chal-card'+(completed?' completed':'')+(locked?' locked':'');
-    card.innerHTML=`<div class="chal-num">${c.num}</div>${completed?'<div class="chal-check">✓</div>':''}<div class="chal-info">${c.rows}×${c.cols}<br>${c.shape}</div>`;
+    const shapeInfo=c.shape==='pyramid3d'?'3D Pyramid':`${c.rows}×${c.cols}`;
+    card.innerHTML=`<div class="chal-num">${c.num}</div>${completed?'<div class="chal-check">✓</div>':''}<div class="chal-info">${shapeInfo}<br>${c.shape==='pyramid3d'?'3D':'flat'}</div>`;
     if(!locked)card.addEventListener('click',()=>startChallenge(c));
     grid.appendChild(card);
   });
@@ -726,6 +751,7 @@ function renderChallengeScreen(diff){
 // INIT LEVEL
 // ═══════════════════════════════════════════════════
 function startChallenge(challenge){
+  if(challenge.shape==='pyramid3d'){initPyramid3d(challenge);return;}
   currentChallenge=challenge;
   lv=parseLevel(challenge);
   rows=lv.rows;cols=lv.cols;
@@ -764,12 +790,13 @@ function cellsAt(i,br,bc){return tfm(i).map(([r,c])=>[br+r,bc+c]);}
 // ═══════════════════════════════════════════════════
 function buildBoard(){
   const el=document.getElementById('board');
+  // Reset any pyramid3d canvas styles
+  el.style.cssText='';
   const panel=document.getElementById('gPanel');
   const aw=window.innerWidth-(panel?panel.offsetWidth:182)-22;
   const ah=window.innerHeight-document.getElementById('gHdr').offsetHeight-22;
   const sz=Math.min(54,Math.floor(Math.min(aw/cols,ah/rows))-5);
   document.documentElement.style.setProperty('--cs',sz+'px');
-  // Reset any pyramid flex styles from previous board
   el.style.gridTemplateColumns=`repeat(${cols},var(--cs))`;
   el.innerHTML='';
 
@@ -921,8 +948,8 @@ function onCell(r,c){
 }
 function remPiece(i){for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(board[r][c]===i)board[r][c]=null;ps[i].placed=false;}
 function pushHistory(){history.push({board:board.map(r=>[...r]),ps:ps.map(p=>({...p}))});if(history.length>30)history.shift();}
-function undo(){if(!history.length)return;const s=history.pop();board=s.board;ps=s.ps;sel=null;hov=null;updRem();buildTray();render();}
-function updRem(){document.getElementById('gRem').textContent=ps.filter(p=>!p.placed&&!p.fixed).length;}
+function undo(){if(pyr3d){undoPyr3d();return;}if(!history.length)return;const s=history.pop();board=s.board;ps=s.ps;sel=null;hov=null;updRem();buildTray();render();}
+function updRem(){if(pyr3d){let r=0;pyr3d.layers.forEach(l=>l.pieces.forEach(p=>{if(!p.placed&&!p.fixed)r++;}));document.getElementById('gRem').textContent=r;return;}document.getElementById('gRem').textContent=ps.filter(p=>!p.placed&&!p.fixed).length;}
 
 // ═══════════════════════════════════════════════════
 // WIN
@@ -955,6 +982,7 @@ function getNextChallenge(){
 // SOLVE (auto-solution animation)
 // ═══════════════════════════════════════════════════
 function doSolve(){
+  if(pyr3d){doSolvePyr3d();return;}
   pushHistory();
   board=Array.from({length:rows},()=>Array(cols).fill(null));
   lv.blocked.forEach(k=>{const[r,c]=k.split(',').map(Number);board[r][c]=-1;});
@@ -1203,14 +1231,397 @@ document.getElementById('bDevTest').addEventListener('click',()=>{
 
 document.addEventListener('keydown',e=>{
   if(!document.getElementById('s-game').classList.contains('active'))return;
-  if(e.key==='Escape'){sel=null;buildTray();render();return;}
+  if(e.key==='Escape'){
+    if(pyr3d){pyr3d.selLtr=null;buildTrayPyr3d();renderPyramid3d();}
+    else{sel=null;buildTray();render();}
+    return;
+  }
   if(e.ctrlKey&&e.key==='z'){undo();return;}
   if(e.key===' '){e.preventDefault();paused?resumeGame():pauseGame();return;}
+  if(pyr3d){
+    if(pyr3d.selLtr===null)return;
+    const res=p3dFindPiece(pyr3d.selLtr);if(!res)return;
+    const p=res.piece;
+    if(e.key==='r'||e.key==='R'){p.rot=(p.rot+1)%4;buildTrayPyr3d();renderPyramid3d();}
+    if(e.key==='f'||e.key==='F'){p.flip=!p.flip;buildTrayPyr3d();renderPyramid3d();}
+    return;
+  }
   if(sel===null)return;
   if(e.key==='r'||e.key==='R'){ps[sel].rot=(ps[sel].rot+1)%4;buildTray();render();}
   if(e.key==='f'||e.key==='F'){ps[sel].flip=!ps[sel].flip;buildTray();render();}
 });
-window.addEventListener('resize',()=>{if(document.getElementById('s-game').classList.contains('active')){buildBoard();render();}});
+window.addEventListener('resize',()=>{
+  if(!document.getElementById('s-game').classList.contains('active'))return;
+  if(pyr3d){renderPyramid3d();return;}
+  buildBoard();render();
+});
+
+// ═══════════════════════════════════════════════════
+// PYRAMID 3D MODE
+// ═══════════════════════════════════════════════════
+const P3TW=30,P3TH=15,P3SH=15;
+const P3OFF=[0,0.5,1,1.5,2];
+
+function p3Iso(col,row,lyr){
+  const off=P3OFF[lyr]||0;
+  const ox=pyr3d?.ox||230,oy=pyr3d?.oy||110;
+  return{x:ox+(col-row)*P3TW, y:oy+(col+row+2*off)*P3TH-lyr*(2*P3TH+P3SH)};
+}
+
+function p3MulRgb(hex,f){
+  if(!hex||!hex.startsWith('#'))return hex||'#555';
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return`rgb(${~~(r*f)},${~~(g*f)},${~~(b*f)})`;
+}
+
+function p3DrawTile(ctx,col,row,lyr,color,opts){
+  const{hover=false,ghost=false,preview=false,bad=false,fixed:isFixed=false}=opts||{};
+  const{x,y}=p3Iso(col,row,lyr);
+  const TW=P3TW,TH=P3TH,SH=P3SH;
+  const base=color||(ghost?'#2a2a4a':'#1e2a3d');
+  const f=hover?1.4:ghost?0.3:preview?0.75:1.0;
+  const topCol=bad?p3MulRgb('#ff4444',1.1):p3MulRgb(base,f);
+  // top face
+  ctx.beginPath();
+  ctx.moveTo(x,y);ctx.lineTo(x+TW,y+TH);ctx.lineTo(x,y+2*TH);ctx.lineTo(x-TW,y+TH);
+  ctx.closePath();ctx.fillStyle=topCol;ctx.fill();
+  ctx.strokeStyle=hover?'rgba(255,255,255,.75)':ghost?'rgba(255,255,255,.12)':'rgba(0,0,0,.45)';
+  ctx.lineWidth=hover?2:1;ctx.stroke();
+  // left face
+  ctx.beginPath();
+  ctx.moveTo(x-TW,y+TH);ctx.lineTo(x,y+2*TH);ctx.lineTo(x,y+2*TH+SH);ctx.lineTo(x-TW,y+TH+SH);
+  ctx.closePath();ctx.fillStyle=bad?p3MulRgb('#ff4444',0.6):p3MulRgb(base,f*0.6);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.stroke();
+  // right face
+  ctx.beginPath();
+  ctx.moveTo(x,y+2*TH);ctx.lineTo(x+TW,y+TH);ctx.lineTo(x+TW,y+TH+SH);ctx.lineTo(x,y+2*TH+SH);
+  ctx.closePath();ctx.fillStyle=bad?p3MulRgb('#ff4444',0.42):p3MulRgb(base,f*0.42);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;ctx.stroke();
+  if(isFixed){
+    ctx.font='10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText('🔒',x,y+TH);
+  }
+}
+
+function p3CellsAt(piece,br,bc){
+  let cs=piece.cells.map(x=>[...x]);
+  for(let k=0;k<piece.rot;k++)cs=cs.map(([r,c])=>[c,-r]);
+  if(piece.flip)cs=cs.map(([r,c])=>[r,-c]);
+  const mr=Math.min(...cs.map(([r])=>r)),mc=Math.min(...cs.map(([,c])=>c));
+  cs=cs.map(([r,c])=>[r-mr,c-mc]);
+  return cs.map(([r,c])=>[br+r,bc+c]);
+}
+
+function p3dFindPiece(letter){
+  for(const lyrData of pyr3d.layers){
+    const p=lyrData.pieces.find(p=>p.letter===letter);
+    if(p)return{piece:p,lyrData};
+  }
+  return null;
+}
+
+function p3CanPlace(piece,lyrData,br,bc){
+  for(const[r,c]of p3CellsAt(piece,br,bc)){
+    if(r<0||r>=lyrData.rows||c<0||c>=lyrData.cols)return false;
+    if(lyrData.board[r][c]!==null)return false;
+  }
+  return true;
+}
+
+function p3SmartAnchor(piece,lyrData,tr,tc){
+  const cs=p3CellsAt(piece,0,0);
+  for(const[dr,dc]of cs){
+    const br=tr-dr,bc=tc-dc;
+    if(p3CanPlace(piece,lyrData,br,bc))return[br,bc];
+  }
+  if(p3CanPlace(piece,lyrData,tr,tc))return[tr,tc];
+  return null;
+}
+
+function parsePyramid3d(ch){
+  pyr3d={challenge:ch,layers:[],selLtr:null,hov:null,history:[],canvas:null,ctx:null};
+  ch.layers.forEach((def,lyrIdx)=>{
+    const{rows,cols,grid,fixed:fixedLetters=[]}=def;
+    const map={};
+    grid.forEach((line,r)=>[...line].forEach((lt,c)=>{
+      if(!map[lt])map[lt]=[];map[lt].push([r,c]);
+    }));
+    const pieces=Object.keys(map).sort().map(lt=>{
+      const abs=map[lt];
+      const mr=Math.min(...abs.map(([r])=>r)),mc=Math.min(...abs.map(([,c])=>c));
+      return{letter:lt,color:COL[LC[lt]]||'#888',
+             cells:abs.map(([r,c])=>[r-mr,c-mc]),solveR:mr,solveC:mc,
+             fixed:fixedLetters.includes(lt),placed:false,rot:0,flip:false,lyrIdx};
+    });
+    const board=Array.from({length:rows},()=>Array(cols).fill(null));
+    pieces.forEach(p=>{
+      if(p.fixed){
+        p.placed=true;
+        p3CellsAt(p,p.solveR,p.solveC).forEach(([r,c])=>{board[r][c]=p.letter;});
+      }
+    });
+    pyr3d.layers.push({rows,cols,board,pieces});
+  });
+}
+
+function buildBoardPyramid3d(){
+  const el=document.getElementById('board');
+  el.style.cssText='display:flex;align-items:center;justify-content:center;padding:0;background:transparent;border:none;box-shadow:none;border-radius:0;gap:0;';
+  el.innerHTML='';
+  // Compute available area
+  const panel=document.getElementById('gPanel');
+  const hdr=document.getElementById('gHdr');
+  const aw=Math.min(480,window.innerWidth-(panel?panel.offsetWidth:182)-24);
+  const ah=Math.min(260,window.innerHeight-(hdr?hdr.offsetHeight:60)-24);
+  const cv=document.createElement('canvas');
+  cv.id='pyr3dCanvas';cv.width=Math.max(320,aw);cv.height=Math.max(200,ah);
+  el.appendChild(cv);
+  pyr3d.canvas=cv;pyr3d.ctx=cv.getContext('2d');
+  // Dynamic origin: pyramid needs 93px above OY and 102px below OY
+  pyr3d.ox=Math.round(cv.width/2);
+  pyr3d.oy=Math.max(93,Math.min(cv.height-102,Math.round(cv.height*0.48)));
+  cv.addEventListener('mousemove',e=>{
+    const rect=cv.getBoundingClientRect();
+    const sx=cv.width/rect.width,sy=cv.height/rect.height;
+    const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+    const hit=p3HitTest(mx,my);
+    const same=pyr3d.hov&&hit&&pyr3d.hov.lyr===hit.lyr&&pyr3d.hov.r===hit.r&&pyr3d.hov.c===hit.c;
+    if(!same){pyr3d.hov=hit;renderPyramid3d();}
+  });
+  cv.addEventListener('mouseleave',()=>{pyr3d.hov=null;renderPyramid3d();});
+  cv.addEventListener('click',e=>{
+    const rect=cv.getBoundingClientRect();
+    const sx=cv.width/rect.width,sy=cv.height/rect.height;
+    const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+    const hit=p3HitTest(mx,my);
+    if(hit)onCellPyr3d(hit.lyr,hit.r,hit.c);
+  });
+  cv.addEventListener('dblclick',e=>{
+    const rect=cv.getBoundingClientRect();
+    const sx=cv.width/rect.width,sy=cv.height/rect.height;
+    const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+    const hit=p3HitTest(mx,my);
+    if(!hit)return;
+    const lyrData=pyr3d.layers[hit.lyr];
+    const letter=lyrData&&lyrData.board[hit.r][hit.c];
+    if(letter){const res=p3dFindPiece(letter);if(res&&!res.piece.fixed){p3PushHistory();p3RemPiece(res.piece,lyrData);pyr3d.selLtr=null;updRem();buildTrayPyr3d();renderPyramid3d();}}
+  });
+  renderPyramid3d();
+}
+
+function p3HitTest(mx,my){
+  const cells=[];
+  pyr3d.layers.forEach((lyrData,lyrIdx)=>{
+    const off=P3OFF[lyrIdx]||0;
+    for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++){
+      cells.push({lyr:lyrIdx,r,c,key:(c+r+2*off)*10+lyrIdx});
+    }
+  });
+  cells.sort((a,b)=>b.key-a.key);
+  for(const cell of cells){
+    const{x,y}=p3Iso(cell.c,cell.r,cell.lyr);
+    if(Math.abs((mx-x)/P3TW)+Math.abs((my-(y+P3TH))/P3TH)<=1)return cell;
+  }
+  return null;
+}
+
+function renderPyramid3d(){
+  if(!pyr3d||!pyr3d.ctx)return;
+  const ctx=pyr3d.ctx,cv=pyr3d.canvas;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // build all cells (interactive + decorative)
+  const cells=[];
+  pyr3d.layers.forEach((lyrData,lyrIdx)=>{
+    const off=P3OFF[lyrIdx]||0;
+    for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++){
+      cells.push({lyr:lyrIdx,r,c,interactive:true,key:(c+r+2*off)*10+lyrIdx});
+    }
+  });
+  // decorative top layers: 2×2 (index 2) and 1×1 (index 3)
+  const decSizes=[2,1];
+  decSizes.forEach((sz,di)=>{
+    const lyrIdx=pyr3d.layers.length+di;
+    const off=P3OFF[lyrIdx]||0;
+    for(let r=0;r<sz;r++)for(let c=0;c<sz;c++){
+      cells.push({lyr:lyrIdx,r,c,interactive:false,key:(c+r+2*off)*10+lyrIdx});
+    }
+  });
+  cells.sort((a,b)=>a.key-b.key);
+  // compute preview cells
+  let previewSet=null,previewBad=false;
+  if(pyr3d.selLtr&&pyr3d.hov&&pyr3d.hov.lyr<pyr3d.layers.length){
+    const hit=pyr3d.hov;
+    const res=p3dFindPiece(pyr3d.selLtr);
+    if(res&&res.piece.lyrIdx===hit.lyr){
+      const lyrData=pyr3d.layers[hit.lyr];
+      const anchor=p3SmartAnchor(res.piece,lyrData,hit.r,hit.c);
+      if(anchor){
+        previewSet=new Set(p3CellsAt(res.piece,anchor[0],anchor[1]).map(([r,c])=>`${hit.lyr},${r},${c}`));
+      }else{
+        previewSet=new Set(p3CellsAt(res.piece,hit.r,hit.c).map(([r,c])=>`${hit.lyr},${r},${c}`));
+        previewBad=true;
+      }
+    }
+  }
+  for(const cell of cells){
+    if(!cell.interactive){p3DrawTile(ctx,cell.c,cell.r,cell.lyr,null,{ghost:true});continue;}
+    const lyrData=pyr3d.layers[cell.lyr];
+    const letter=lyrData.board[cell.r][cell.c];
+    const isHov=pyr3d.hov&&pyr3d.hov.lyr===cell.lyr&&pyr3d.hov.r===cell.r&&pyr3d.hov.c===cell.c;
+    const inPrev=previewSet&&previewSet.has(`${cell.lyr},${cell.r},${cell.c}`);
+    if(letter){
+      const res=p3dFindPiece(letter);
+      p3DrawTile(ctx,cell.c,cell.r,cell.lyr,res?res.piece.color:'#888',{hover:isHov,fixed:res&&res.piece.fixed});
+    }else if(inPrev){
+      const res=p3dFindPiece(pyr3d.selLtr);
+      p3DrawTile(ctx,cell.c,cell.r,cell.lyr,res?res.piece.color:'#888',{preview:!previewBad,bad:previewBad});
+    }else{
+      p3DrawTile(ctx,cell.c,cell.r,cell.lyr,null,{hover:isHov&&!pyr3d.selLtr});
+    }
+  }
+  // layer labels
+  ctx.font='11px Segoe UI,system-ui';ctx.textAlign='left';
+  pyr3d.layers.forEach((lyrData,lyrIdx)=>{
+    ctx.fillStyle=lyrIdx===0?'rgba(249,202,36,.55)':'rgba(100,180,255,.55)';
+    const{x,y}=p3Iso(0,lyrData.rows-1,lyrIdx);
+    ctx.fillText(`L${lyrIdx} (${lyrData.rows}×${lyrData.cols})`,x-P3TW-2,y+2*P3TH+9);
+  });
+}
+
+function onCellPyr3d(lyr,r,c){
+  if(paused)return;
+  if(lyr>=pyr3d.layers.length)return;
+  const lyrData=pyr3d.layers[lyr];
+  const letter=lyrData.board[r][c];
+  if(pyr3d.selLtr===null){
+    if(letter){
+      const res=p3dFindPiece(letter);
+      if(res&&!res.piece.fixed){
+        p3PushHistory();p3RemPiece(res.piece,lyrData);
+        pyr3d.selLtr=letter;updRem();buildTrayPyr3d();renderPyramid3d();
+      }
+    }
+    return;
+  }
+  const res=p3dFindPiece(pyr3d.selLtr);if(!res)return;
+  const{piece}=res;
+  if(piece.lyrIdx!==lyr){renderPyramid3d();return;}
+  const anchor=p3SmartAnchor(piece,lyrData,r,c);
+  if(!anchor){renderPyramid3d();return;}
+  p3PushHistory();
+  p3CellsAt(piece,anchor[0],anchor[1]).forEach(([pr,pc])=>{lyrData.board[pr][pc]=piece.letter;});
+  piece.placed=true;pyr3d.selLtr=null;updRem();buildTrayPyr3d();renderPyramid3d();checkWinPyr3d();
+}
+
+function p3RemPiece(piece,lyrData){
+  for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++)if(lyrData.board[r][c]===piece.letter)lyrData.board[r][c]=null;
+  piece.placed=false;
+}
+
+function p3PushHistory(){
+  pyr3d.history.push({
+    layers:pyr3d.layers.map(l=>({board:l.board.map(row=>[...row]),pieces:l.pieces.map(p=>({...p}))})),
+    selLtr:pyr3d.selLtr
+  });
+  if(pyr3d.history.length>30)pyr3d.history.shift();
+}
+
+function undoPyr3d(){
+  if(!pyr3d||!pyr3d.history.length)return;
+  const snap=pyr3d.history.pop();
+  pyr3d.layers.forEach((lyrData,i)=>{lyrData.board=snap.layers[i].board;lyrData.pieces=snap.layers[i].pieces;});
+  pyr3d.selLtr=null;updRem();buildTrayPyr3d();renderPyramid3d();
+}
+
+function checkWinPyr3d(){
+  for(const lyrData of pyr3d.layers)
+    for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++)if(lyrData.board[r][c]===null)return;
+  clearInterval(tmID);
+  markCompleted(pyr3d.challenge.id);
+  const isRec=saveBestTime(pyr3d.challenge.id,elapsed);
+  document.getElementById('winTitle').textContent='🎉 Puzzle Solved!';
+  document.getElementById('winMsg').textContent=`${pyr3d.challenge.difficulty} · Challenge ${pyr3d.challenge.num}`;
+  document.getElementById('winTime').textContent=`Time: ${fmt(elapsed)}`;
+  document.getElementById('winRecord').textContent=isRec?'🏆 Personal Best!':'';
+  const next=getNextChallenge();
+  document.getElementById('bWinNext').style.display=next?'':'none';
+  document.getElementById('winModal').classList.add('show');
+  saveScore(elapsed);
+}
+
+function buildTrayPyr3d(){
+  const wrap=document.getElementById('plist');wrap.innerHTML='';
+  pyr3d.layers.forEach((lyrData,lyrIdx)=>{
+    const hdr=document.createElement('div');hdr.className='pyr3d-lyr-hdr';
+    hdr.textContent=`Layer ${lyrIdx} (${lyrData.rows}×${lyrData.cols})`;
+    wrap.appendChild(hdr);
+    lyrData.pieces.forEach(piece=>{
+      if(piece.fixed)return;
+      const cs=p3CellsAt(piece,0,0);
+      const mr=Math.max(...cs.map(([r])=>r)),mc=Math.max(...cs.map(([,c])=>c));
+      const occ=new Set(cs.map(([r,c])=>`${r},${c}`));
+      const color=piece.color;
+      const card=document.createElement('div');
+      card.className='pcard'+(piece.placed?' placed':pyr3d.selLtr===piece.letter?' sel':'');
+      const pg=document.createElement('div');pg.className='pgrid';
+      pg.style.gridTemplateRows=`repeat(${mr+1},17px)`;
+      pg.style.gridTemplateColumns=`repeat(${mc+1},17px)`;
+      for(let r=0;r<=mr;r++)for(let c=0;c<=mc;c++){
+        const b=document.createElement('div');b.className='pdot';
+        if(occ.has(`${r},${c}`)){b.style.background=`radial-gradient(circle at 33% 28%,rgba(255,255,255,.5) 0%,${color} 55%)`;b.style.boxShadow='0 2px 4px rgba(0,0,0,.4)';}
+        else b.style.background='transparent';
+        pg.appendChild(b);
+      }
+      card.appendChild(pg);
+      const info=document.createElement('div');info.className='pinfo';
+      const nm=document.createElement('div');nm.className='pname';nm.textContent=piece.letter;
+      const btns=document.createElement('div');btns.className='pbtns';
+      const br=document.createElement('button');br.textContent='🔄';
+      br.addEventListener('click',e=>{e.stopPropagation();if(!piece.placed){piece.rot=(piece.rot+1)%4;buildTrayPyr3d();renderPyramid3d();}});
+      const bf=document.createElement('button');bf.textContent='🪞';
+      bf.addEventListener('click',e=>{e.stopPropagation();if(!piece.placed){piece.flip=!piece.flip;buildTrayPyr3d();renderPyramid3d();}});
+      btns.append(br,bf);info.append(nm,btns);card.appendChild(info);
+      card.addEventListener('click',()=>{
+        if(piece.placed||piece.fixed)return;
+        pyr3d.selLtr=(pyr3d.selLtr===piece.letter)?null:piece.letter;
+        buildTrayPyr3d();renderPyramid3d();
+      });
+      wrap.appendChild(card);
+    });
+  });
+}
+
+function doSolvePyr3d(){
+  p3PushHistory();
+  pyr3d.layers.forEach(lyrData=>{
+    lyrData.board=Array.from({length:lyrData.rows},()=>Array(lyrData.cols).fill(null));
+    lyrData.pieces.forEach(p=>{
+      if(p.fixed){p.placed=true;p3CellsAt(p,p.solveR,p.solveC).forEach(([r,c])=>{lyrData.board[r][c]=p.letter;});}
+      else p.placed=false;
+    });
+  });
+  pyr3d.selLtr=null;
+  const all=[];
+  pyr3d.layers.forEach(lyrData=>lyrData.pieces.forEach(p=>{if(!p.fixed)all.push({piece:p,lyrData});}));
+  all.forEach(({piece,lyrData},i)=>setTimeout(()=>{
+    p3CellsAt(piece,piece.solveR,piece.solveC).forEach(([r,c])=>{lyrData.board[r][c]=piece.letter;});
+    piece.placed=true;updRem();buildTrayPyr3d();renderPyramid3d();
+    if(i===all.length-1)checkWinPyr3d();
+  },i*260));
+}
+
+function initPyramid3d(challenge){
+  pyr3d=null;
+  currentChallenge=challenge;
+  lv=null;rows=0;cols=0;board=[];ps=[];
+  sel=null;hov=null;elapsed=0;history=[];paused=false;hintLevel=0;
+  parsePyramid3d(challenge);
+  document.getElementById('gLvl').textContent=`${challenge.difficulty} #${challenge.num}`;
+  document.getElementById('pauseOverlay').classList.remove('show');
+  document.getElementById('winModal').classList.remove('show');
+  buildBoardPyramid3d();buildTrayPyr3d();updRem();startTimer();
+  showScreen('s-game');
+}
 
 // ═══════════════════════════════════════════════════
 // START
