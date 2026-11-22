@@ -166,6 +166,9 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 #bNextHint{width:100%;padding:9px;background:linear-gradient(135deg,#fdcb6e,#e17055);border:none;border-radius:10px;color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;margin-bottom:8px}
 
 /* Leaderboard */
+.lb-diff-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.lb-diff-tab{padding:5px 11px;border:1.5px solid var(--border);border-radius:16px;background:var(--panel);color:var(--muted);font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.lb-diff-tab.active{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
 .lb-tabs{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap}
 .lb-tab{padding:3px 9px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--muted);font-size:.68rem;cursor:pointer}
 .lb-tab.active{border-color:var(--accent);color:var(--accent);background:#f9ca2411}
@@ -173,6 +176,15 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 .lb-table th{color:var(--muted);text-align:left;padding:3px 5px;border-bottom:1px solid var(--border)}
 .lb-table td{padding:4px 5px;border-bottom:1px solid #21262d}
 .lb-table tr:first-child td{color:var(--accent)}
+/* Login modal */
+#loginModal .mbox{max-width:320px;text-align:center}
+.google-signin-btn{display:flex;align-items:center;gap:10px;background:#fff;color:#3c4043;border:1.5px solid #dadce0;border-radius:8px;padding:10px 16px;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;transition:box-shadow .15s;width:100%;justify-content:center;margin:0 0 12px}
+.google-signin-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.google-signin-btn svg{flex-shrink:0}
+.login-or{color:var(--muted);font-size:.78rem;margin:8px 0}
+#guestNameInput{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--panel);color:var(--fg);font-family:inherit;font-size:.88rem;margin-bottom:9px;box-sizing:border-box}
+#guestLoginBtn{width:100%;padding:9px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;margin-bottom:8px}
+.avatar-photo{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--border)}
 
 /* Dev Panel */
 #devPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;flex-direction:column;overflow-y:auto;padding:18px;gap:14px}
@@ -325,9 +337,35 @@ body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(
 <div class="modal" id="lbModal">
   <div class="mbox">
     <h3 id="lbTitle">🏆 LEADERBOARD</h3>
+    <div class="lb-diff-tabs" id="lbDiffTabs"></div>
     <div class="lb-tabs" id="lbTabs"></div>
     <table class="lb-table"><thead><tr><th>#</th><th>Name</th><th>Time</th><th>Date</th></tr></thead><tbody id="lbBody"></tbody></table>
     <button class="mclose" id="lbClose">Close</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="mbox">
+    <div style="font-size:1.3rem;font-weight:700;margin-bottom:6px">🎮 Profil</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:16px">Skorlarınızı kaydetmek ve liderlik tablosuna girmek için giriş yapın.</p>
+    <div id="googleBtnArea">
+      <button class="google-signin-btn" id="googleSignInBtn">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.3 9.1 3.4l6.8-6.8C35.7 2.5 30.1 0 24 0 14.7 0 6.9 5.5 3 13.4l7.9 6.1C12.8 13 18 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.7c-.6 3-2.3 5.6-4.9 7.3l7.5 5.8c4.4-4.1 7.2-10.1 7.2-17.5z"/><path fill="#FBBC05" d="M10.9 28.5A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L2.4 13.4A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.4-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.5-5.8c-2 1.4-4.6 2.3-7.5 2.3-6 0-11.1-4-12.9-9.5l-7.9 6.1C6.9 42.5 14.7 48 24 48z"/></svg>
+        Google ile giriş yap
+      </button>
+    </div>
+    <div class="login-or">— veya kullanıcı adı ile —</div>
+    <input type="text" id="guestNameInput" placeholder="Kullanıcı adı girin" maxlength="20" autocomplete="off">
+    <button id="guestLoginBtn">Oyna</button>
+    <div id="loggedInArea" style="display:none;padding:10px;background:var(--panel);border-radius:8px;margin-bottom:8px;text-align:left;font-size:.82rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span id="loginAvatarChip" style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0"></span>
+        <div><div id="loginName" style="font-weight:600"></div><div id="loginEmail" style="color:var(--muted);font-size:.72rem"></div></div>
+      </div>
+      <button id="logoutBtn" style="width:100%;padding:7px;background:#21262d;color:var(--fg);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.82rem;cursor:pointer">Çıkış yap</button>
+    </div>
+    <button class="mclose" id="loginCloseBtn">Kapat</button>
   </div>
 </div>
 
@@ -1064,20 +1102,46 @@ function saveScore(secs){
   scores.push({name,chalId:currentChallenge.id,level:`${currentChallenge.difficulty} #${currentChallenge.num}`,time:secs,date:new Date().toISOString().slice(0,10)});
   localStorage.setItem('iqball_scores',JSON.stringify(scores));
 }
-let lbChalId=1;
-function showLB(){lbChalId=1;renderLB();document.getElementById('lbModal').classList.add('show');}
+let lbChalId=1,lbDiff='Starter';
+const LB_DIFFS=[...DIFFS,'Pyramid'];
+const LB_DIFF_ICONS={Starter:'🟢',Junior:'🔵',Expert:'🟠',Master:'🟣',Wizard:'🔴',Pyramid:'🔺'};
+function showLB(diff){
+  if(diff)lbDiff=diff;
+  const first=(lbDiff==='Pyramid'?CHALLENGES.filter(c=>c.shape==='pyramid3d'):CHALLENGES.filter(c=>c.difficulty===lbDiff&&c.shape!=='pyramid3d'))[0];
+  lbChalId=first?first.id:1;
+  renderLB();document.getElementById('lbModal').classList.add('show');
+}
 function renderLB(){
-  const tabs=document.getElementById('lbTabs');tabs.innerHTML='';
-  CHALLENGES.forEach(c=>{
-    const btn=document.createElement('button');
-    btn.className='lb-tab'+(lbChalId===c.id?' active':'');
-    btn.textContent=`${c.difficulty[0]}${c.num}`;
-    btn.addEventListener('click',()=>{lbChalId=c.id;renderLB();});
-    tabs.appendChild(btn);
+  // Difficulty tabs
+  const dt=document.getElementById('lbDiffTabs');dt.innerHTML='';
+  LB_DIFFS.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='lb-diff-tab'+(lbDiff===d?' active':'');
+    b.textContent=`${LB_DIFF_ICONS[d]||''}  ${d}`;
+    b.addEventListener('click',()=>{
+      lbDiff=d;
+      const first=(d==='Pyramid'?CHALLENGES.filter(c=>c.shape==='pyramid3d'):CHALLENGES.filter(c=>c.difficulty===d&&c.shape!=='pyramid3d'))[0];
+      lbChalId=first?first.id:1;renderLB();
+    });
+    dt.appendChild(b);
   });
+  // Challenge tabs filtered by difficulty
+  const chals=lbDiff==='Pyramid'
+    ?CHALLENGES.filter(c=>c.shape==='pyramid3d')
+    :CHALLENGES.filter(c=>c.difficulty===lbDiff&&c.shape!=='pyramid3d');
+  const tabs=document.getElementById('lbTabs');tabs.innerHTML='';
+  chals.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='lb-tab'+(lbChalId===c.id?' active':'');
+    b.textContent=lbDiff==='Pyramid'?`#${String(c.num).replace(/[^0-9]/g,'')}`:`#${c.num}`;
+    b.addEventListener('click',()=>{lbChalId=c.id;renderLB();});
+    tabs.appendChild(b);
+  });
+  document.getElementById('lbTitle').textContent=`🏆 ${lbDiff} — Leaderboard`;
+  // Scores
   const scores=getScores().filter(s=>s.chalId===lbChalId).sort((a,b)=>a.time-b.time).slice(0,5);
   const body=document.getElementById('lbBody');body.innerHTML='';
-  if(!scores.length){body.innerHTML='<tr><td colspan="4" style="color:var(--muted);padding:8px">No records yet.</td></tr>';return;}
+  if(!scores.length){body.innerHTML='<tr><td colspan="4" style="color:var(--muted);padding:8px">Henüz kayıt yok.</td></tr>';return;}
   scores.forEach((s,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${['🥇','🥈','🥉','4','5'][i]}</td><td>${s.name}</td><td>${fmt(s.time)}</td><td>${s.date}</td>`;body.appendChild(tr);});
 }
 
@@ -1086,13 +1150,53 @@ function renderLB(){
 // ═══════════════════════════════════════════════════
 function getAvColor(name){if(!name)return'#636e72';let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))%AVCOLS.length;return AVCOLS[h];}
 function getProfile(){return JSON.parse(localStorage.getItem('iqball_profile')||'{"name":"","color":"#e84393"}');}
+function saveProfile(p){localStorage.setItem('iqball_profile',JSON.stringify(p));localStorage.setItem('iqball_name',p.name||'');}
+function isLoggedIn(){const p=getProfile();return !!(p.name);}
 function loadAvatarChip(){
   const p=getProfile();
-  const name=p.name||localStorage.getItem('iqball_name')||'Player';
-  const color=p.color||getAvColor(name);
+  const name=p.name||'Guest';
   const chip=document.getElementById('homeAvatarChip');
-  chip.style.background=color;chip.textContent=(name[0]||'?').toUpperCase();
   document.getElementById('homeUname').textContent=name;
+  if(p.picture){
+    chip.style.background='transparent';chip.innerHTML='';
+    const img=document.createElement('img');
+    img.src=p.picture;img.className='avatar-photo';img.style='width:32px;height:32px;border-radius:50%;object-fit:cover;';
+    chip.appendChild(img);
+  } else {
+    chip.innerHTML='';chip.style.background=p.color||getAvColor(name);
+    chip.textContent=(name[0]||'?').toUpperCase();
+  }
+}
+function showLoginModal(){
+  const p=getProfile();
+  if(p.name){
+    document.getElementById('googleBtnArea').style.display='none';
+    document.querySelector('.login-or').style.display='none';
+    document.getElementById('guestNameInput').style.display='none';
+    document.getElementById('guestLoginBtn').style.display='none';
+    document.getElementById('loggedInArea').style.display='block';
+    document.getElementById('loginName').textContent=p.name;
+    document.getElementById('loginEmail').textContent=p.email||'';
+    const ac=document.getElementById('loginAvatarChip');
+    if(p.picture){ac.innerHTML=`<img src="${p.picture}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;">`;ac.style.background='transparent';}
+    else{ac.textContent=(p.name[0]||'?').toUpperCase();ac.style.background=p.color||getAvColor(p.name);}
+  } else {
+    document.getElementById('googleBtnArea').style.display='block';
+    document.querySelector('.login-or').style.display='block';
+    document.getElementById('guestNameInput').style.display='block';
+    document.getElementById('guestLoginBtn').style.display='block';
+    document.getElementById('loggedInArea').style.display='none';
+    document.getElementById('guestNameInput').value='';
+  }
+  document.getElementById('loginModal').classList.add('show');
+}
+function handleGoogleSignIn(response){
+  try{
+    const payload=JSON.parse(atob(response.credential.split('.')[1]));
+    const p={name:payload.name,email:payload.email,picture:payload.picture,color:getAvColor(payload.name)};
+    saveProfile(p);loadAvatarChip();
+    document.getElementById('loginModal').classList.remove('show');
+  }catch(e){console.error('Google sign-in error',e);}
 }
 
 // ═══════════════════════════════════════════════════
@@ -1259,14 +1363,36 @@ document.getElementById('gBtnReset').addEventListener('click',()=>startChallenge
 document.getElementById('gBtnUndo').addEventListener('click',undo);
 document.getElementById('bResume').addEventListener('click',resumeGame);
 document.getElementById('bWinMenu').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');goHome();});
-document.getElementById('bWinRetry').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');startChallenge(currentChallenge);});
-document.getElementById('bWinNext').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');const n=getNextChallenge();if(n)startChallenge(n);});
+document.getElementById('bWinRetry').addEventListener('click',()=>{document.getElementById('winModal').classList.remove('show');startChallenge(pyr3d?pyr3d.challenge:currentChallenge);});
+document.getElementById('bWinNext').addEventListener('click',()=>{
+  document.getElementById('winModal').classList.remove('show');
+  const n=pyr3d?getNextPyr3dChallenge():getNextChallenge();
+  if(n)startChallenge(n);
+});
 document.getElementById('hintClose').addEventListener('click',()=>document.getElementById('hintModal').classList.remove('show'));
 document.getElementById('bNextHint').addEventListener('click',showNextHint);
 document.getElementById('lbClose').addEventListener('click',()=>document.getElementById('lbModal').classList.remove('show'));
-document.getElementById('homeAvatarChip').addEventListener('click',()=>{
-  const name=(prompt('Enter your display name:',localStorage.getItem('iqball_name')||'')||'').trim();
-  if(name){const p=getProfile();p.name=name;p.color=getAvColor(name);localStorage.setItem('iqball_profile',JSON.stringify(p));localStorage.setItem('iqball_name',name);loadAvatarChip();}
+document.getElementById('homeAvatarChip').addEventListener('click',showLoginModal);
+document.getElementById('loginCloseBtn').addEventListener('click',()=>document.getElementById('loginModal').classList.remove('show'));
+document.getElementById('guestLoginBtn').addEventListener('click',()=>{
+  const name=document.getElementById('guestNameInput').value.trim();
+  if(!name)return;
+  const p={name,color:getAvColor(name),email:'',picture:''};
+  saveProfile(p);loadAvatarChip();
+  document.getElementById('loginModal').classList.remove('show');
+});
+document.getElementById('guestNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('guestLoginBtn').click();});
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  localStorage.removeItem('iqball_profile');localStorage.removeItem('iqball_name');
+  loadAvatarChip();showLoginModal();
+});
+document.getElementById('googleSignInBtn').addEventListener('click',()=>{
+  // Real Google Sign-In requires a client_id configured via Google Cloud Console.
+  // For now, guide user to set their name as a workaround.
+  document.getElementById('guestNameInput').focus();
+  document.getElementById('guestNameInput').style.borderColor='var(--accent)';
+  setTimeout(()=>document.getElementById('guestNameInput').style.borderColor='',1500);
+  alert('Google Sign-In için Google Cloud Console\'dan OAuth 2.0 Client ID alın ve GOOGLE_CLIENT_ID sabitine ekleyin.');
 });
 document.getElementById('bDevMode').addEventListener('click',()=>{document.getElementById('devPanel').classList.add('show');buildDevGrid();});
 document.getElementById('bDevClose').addEventListener('click',()=>document.getElementById('devPanel').classList.remove('show'));
@@ -1642,6 +1768,11 @@ function undoPyr3d(){
   pyr3d.selLtr=null;updRem();buildTrayPyr3d();renderPyramid3d();
 }
 
+function getNextPyr3dChallenge(){
+  const pyrs=CHALLENGES.filter(c=>c.shape==='pyramid3d');
+  const idx=pyrs.findIndex(c=>c.id===pyr3d.challenge.id);
+  return idx>=0&&idx<pyrs.length-1?pyrs[idx+1]:null;
+}
 function checkWinPyr3d(){
   for(const lyrData of pyr3d.layers)
     for(let r=0;r<lyrData.rows;r++)for(let c=0;c<lyrData.cols;c++)if(lyrData.board[r][c]===null)return;
@@ -1649,26 +1780,33 @@ function checkWinPyr3d(){
   markCompleted(pyr3d.challenge.id);
   const isRec=saveBestTime(pyr3d.challenge.id,elapsed);
   const snap=elapsed;
-  saveScore(snap);
-  // Show a subtle "solved" banner on the canvas, then wait for user to press Next
+  // Save score with pyramid challenge info
+  {const name=localStorage.getItem('iqball_name')||'';
+   if(name){const scores=getScores();scores.push({name,chalId:pyr3d.challenge.id,level:`${pyr3d.challenge.difficulty} ${pyr3d.challenge.num}`,time:snap,date:new Date().toISOString().slice(0,10)});localStorage.setItem('iqball_scores',JSON.stringify(scores));}}
+  const ch=pyr3d.challenge;
+  function openWinModal(){
+    document.getElementById('winTitle').textContent='🎉 Tamamlandı!';
+    document.getElementById('winMsg').textContent=`${ch.difficulty} · ${ch.num}`;
+    document.getElementById('winTime').textContent=`Süre: ${fmt(snap)}`;
+    document.getElementById('winRecord').textContent=isRec?'🏆 Kişisel Rekor!':'';
+    const next=getNextPyr3dChallenge();
+    document.getElementById('bWinNext').style.display=next?'':'none';
+    document.getElementById('winModal').classList.add('show');
+  }
+  // Show banner on canvas; user clicks to open win modal
   if(pyr3d.canvas){
     const ctx=pyr3d.ctx,cv=pyr3d.canvas;
     ctx.save();
-    ctx.fillStyle='rgba(10,20,40,0.72)';ctx.fillRect(0,cv.height-38,cv.width,38);
+    ctx.fillStyle='rgba(10,20,40,0.80)';ctx.fillRect(0,cv.height-44,cv.width,44);
     ctx.font='bold 15px Segoe UI,system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#f9ca24';ctx.fillText('🎉 Tamamlandı! — Devam için ▶ Next',cv.width/2,cv.height-19);
+    ctx.fillStyle='#f9ca24';ctx.fillText('🎉 Tamamlandı!',cv.width/2,cv.height-30);
+    ctx.font='12px Segoe UI,system-ui';ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.fillText('▶ Devam etmek için tıklayın',cv.width/2,cv.height-13);
     ctx.restore();
+    cv.addEventListener('click',openWinModal,{once:true});
+  } else {
+    openWinModal();
   }
-  // Show win modal after a short delay so user sees the banner first
-  setTimeout(()=>{
-    document.getElementById('winTitle').textContent='🎉 Puzzle Solved!';
-    document.getElementById('winMsg').textContent=`${pyr3d.challenge.difficulty} · Challenge ${pyr3d.challenge.num}`;
-    document.getElementById('winTime').textContent=`Time: ${fmt(snap)}`;
-    document.getElementById('winRecord').textContent=isRec?'🏆 Personal Best!':'';
-    const next=getNextChallenge();
-    document.getElementById('bWinNext').style.display=next?'':'none';
-    document.getElementById('winModal').classList.add('show');
-  },3500);
 }
 
 function buildTrayPyr3d(){
